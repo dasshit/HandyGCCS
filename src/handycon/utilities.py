@@ -5,20 +5,36 @@
 # Python Modules
 import configparser
 import os
+import pathlib
 import re
 import subprocess
 import sys
 import traceback
 
-## Local modules
-from . import handycon as ally_gen1, handycon as anb_gen1, \
-    handycon as aok_gen1, handycon as aok_gen2, handycon as aya_gen1, \
-    handycon as aya_gen2, handycon as aya_gen3, handycon as aya_gen4, \
-    handycon as aya_gen5, handycon as aya_gen6, handycon as aya_gen7, \
-    handycon as ayn_gen1, handycon as ayn_gen2, handycon as ayn_gen3, \
-    handycon as gpd_gen1, handycon as gpd_gen2, handycon as gpd_gen3, \
-    handycon as oxp_gen1, handycon as oxp_gen2, handycon as oxp_gen3, \
-    handycon as oxp_gen4, handycon as oxp_gen6
+# Local modules
+from . import \
+    handycon as ally_gen1, \
+    handycon as anb_gen1, \
+    handycon as aok_gen1, \
+    handycon as aok_gen2, \
+    handycon as aya_gen1, \
+    handycon as aya_gen2, \
+    handycon as aya_gen3, \
+    handycon as aya_gen4, \
+    handycon as aya_gen5, \
+    handycon as aya_gen6, \
+    handycon as aya_gen7, \
+    handycon as ayn_gen1, \
+    handycon as ayn_gen2, \
+    handycon as ayn_gen3, \
+    handycon as gpd_gen1, \
+    handycon as gpd_gen2, \
+    handycon as gpd_gen3, \
+    handycon as oxp_gen1, \
+    handycon as oxp_gen2, \
+    handycon as oxp_gen3, \
+    handycon as oxp_gen4, \
+    handycon as oxp_gen6
 # import handycon.handhelds.oxp_gen5 as oxp_gen5
 from .constants import \
     CHIMERA_LAUNCHER_PATH, \
@@ -29,10 +45,6 @@ from .constants import \
 
 # Partial imports
 from time import sleep
-
-
-def set_handycon(handycon, handheld_controller):
-    handycon = handheld_controller
 
 
 # Capture the username
@@ -64,46 +76,46 @@ def get_user(handycon):
 # Identify the current device type. Kill script if not atible.
 def id_system(handycon):
 
-    system_id = open("/sys/devices/virtual/dmi/id/product_name", "r").read().strip()
+    system_id = pathlib.Path(
+        "/sys/devices/virtual/dmi/id/product_name").read_text().strip()
     cpu_vendor = get_cpu_vendor()
     handycon.logger.debug(f"Found CPU Vendor: {cpu_vendor}")
 
-    ## ANBERNIC Devices
+    # ANBERNIC Devices
     if system_id in (
             "Win600",
             ):
         handycon.system_type = "ANB_GEN1"
         anb_gen1.init_handheld(handycon)
 
-    ## AOKZOE Devices
+    # AOKZOE Devices
     elif system_id in (
         "AOKZOE A1 AR07",
-        ):
+    ):
         handycon.system_type = "AOK_GEN1"
         aok_gen1.init_handheld(handycon)
 
     elif system_id in (
         "AOKZOE A1 Pro",
-        ):
+    ):
         handycon.system_type = "AOK_GEN2"
         aok_gen2.init_handheld(handycon)
 
-
-    ## ASUS Devices
+    # ASUS Devices
     elif system_id in (
         "ROG Ally RC71L_RC71L",
-        ):
+    ):
         handycon.system_type = "ALY_GEN1"
         ally_gen1.init_handheld(handycon)
 
-    ## Aya Neo Devices
+    # Aya Neo Devices
     elif system_id in (
         "AYA NEO FOUNDER",
         "AYA NEO 2021",
         "AYANEO 2021",
         "AYANEO 2021 Pro",
         "AYANEO 2021 Pro Retro Power",
-        ):
+    ):
         handycon.system_type = "AYA_GEN1"
         aya_gen1.init_handheld(handycon)
 
@@ -114,27 +126,27 @@ def id_system(handycon):
         "AYANEO NEXT",
         "AYANEO NEXT Pro",
         "AYANEO NEXT Advance",
-        ):
+    ):
         handycon.system_type = "AYA_GEN2"
         aya_gen2.init_handheld(handycon)
 
     elif system_id in (
         "AIR",
         "AIR Pro",
-        ):
+    ):
         handycon.system_type = "AYA_GEN3"
         aya_gen3.init_handheld(handycon)
 
     elif system_id in (
         "AYANEO 2",
         "GEEK",
-        ):
+    ):
         handycon.system_type = "AYA_GEN4"
         aya_gen4.init_handheld(handycon)
 
     elif system_id in (
         "AIR Plus",
-        ):
+    ):
         if cpu_vendor == "GenuineIntel":
             handycon.system_type = "AYA_GEN7"
             aya_gen7.init_handheld(handycon)
@@ -146,55 +158,56 @@ def id_system(handycon):
         "AYANEO 2S",
         "GEEK 1S",
         "AIR 1S",
-        ):
+    ):
         handycon.system_type = "AYA_GEN6"
         aya_gen6.init_handheld(handycon)
 
-    ## Ayn Devices
+    # Ayn Devices
     elif system_id in (
-            "Loki Max",
-        ):
+        "Loki Max",
+    ):
         handycon.system_type = "AYN_GEN1"
         ayn_gen1.init_handheld(handycon)
 
     elif system_id in (
-            "Loki Zero",
-        ):
+        "Loki Zero",
+    ):
         handycon.system_type = "AYN_GEN2"
         ayn_gen2.init_handheld(handycon)
 
     elif system_id in (
-            "Loki MiniPro",
-        ):
+        "Loki MiniPro",
+    ):
         handycon.system_type = "AYN_GEN3"
         ayn_gen3.init_handheld(handycon)
 
-    ## GPD Devices.
+    # GPD Devices.
     # Have 2 buttons with 3 modes (left, right, both)
     elif system_id in (
-        "G1618-03", #Win3
-        ):
+        "G1618-03",  # Win3
+    ):
         handycon.system_type = "GPD_GEN1"
         gpd_gen1.init_handheld(handycon)
 
     elif system_id in (
-        "G1619-04", #WinMax2
-        ):
+        "G1619-04",  # WinMax2
+    ):
         handycon.system_type = "GPD_GEN2"
         gpd_gen2.init_handheld(handycon)
 
     elif system_id in (
-        "G1618-04", #Win4
-        ):
+        "G1618-04",  # Win4
+    ):
         handycon.system_type = "GPD_GEN3"
         gpd_gen3.init_handheld(handycon)
 
-    ## ONEXPLAYER and AOKZOE devices.
-    # BIOS have inlete DMI data and most models report as "ONE XPLAYER" or "ONEXPLAYER".
+    # ONEXPLAYER and AOKZOE devices.
+    # BIOS have inlete DMI data
+    # and most models report as "ONE XPLAYER" or "ONEXPLAYER".
     elif system_id in (
         "ONE XPLAYER",
         "ONEXPLAYER",
-        ):
+    ):
 
         # GEN 1
         if cpu_vendor == "GenuineIntel":
@@ -209,19 +222,19 @@ def id_system(handycon):
     # GEN 3
     elif system_id in (
         "ONEXPLAYER mini A07",
-        ):
+    ):
         handycon.system_type = "OXP_GEN3"
         oxp_gen3.init_handheld(handycon)
 
     # GEN 4
     elif system_id in (
         "ONEXPLAYER Mini Pro",
-        ):
+    ):
         handycon.system_type = "OXP_GEN4"
         oxp_gen4.init_handheld(handycon)
 
-    ## GEN 5
-    #elif system_id in (
+    # GEN 5
+    # elif system_id in (
     #    "ONEXPLAYER 2",
     #    "ONEXPLAYER 2 Pro",
     #    ):
@@ -231,7 +244,7 @@ def id_system(handycon):
     # GEN 6
     elif system_id in (
         "ONEXPLAYER F1",
-        ):
+    ):
         handycon.system_type = "OXP_GEN6"
         oxp_gen6.init_handheld(handycon)
 
@@ -252,7 +265,7 @@ def id_system(handycon):
     )
 
 
-def get_cpu_vendor(handycon):
+def get_cpu_vendor():
     cmd = "cat /proc/cpuinfo"
     all_info = subprocess.check_output(cmd, shell=True).decode().strip()
     for line in all_info.split("\n"):
@@ -267,17 +280,19 @@ def get_config(handycon):
         handycon.logger.info(f"Loading existing config: {CONFIG_PATH}")
         handycon.config.read(CONFIG_PATH)
         if "power_button" not in handycon.config["Button Map"]:
-            handycon.logger.info("Config file out of date. Generating new config.")
-            set_default_config()
-            write_config()
+            handycon.logger.info(
+                "Config file out of date. Generating new config."
+            )
+            set_default_config(handycon)
+            write_config(handycon)
     else:
-        set_default_config()
-        write_config()
-    map_config()
+        set_default_config(handycon)
+        write_config(handycon)
+    map_config(handycon)
 
 
 # Match runtime variables to the config 
-def map_config():
+def map_config(handycon):
     # Assign config file values
     handycon.button_map = {
         "button1": EVENT_MAP[handycon.config["Button Map"]["button1"]],
@@ -377,7 +392,7 @@ def launch_chimera(handycon):
     subprocess.run([ "su", handycon.USER, "-c", CHIMERA_LAUNCHER_PATH ])
 
 
-def is_process_running(name) -> bool:
+def is_process_running(handycon, name) -> bool:
     read_proc = os.popen("ps -Af").read()
     proc_count = read_proc.count(name)
     if proc_count > 0:

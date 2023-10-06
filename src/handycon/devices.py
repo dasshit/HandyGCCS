@@ -2,7 +2,7 @@
 # This file is part of Handheld Game Console Controller System (HandyGCCS)
 # Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
 
-## Python Modules
+# Python Modules
 import asyncio
 import os
 import traceback
@@ -42,14 +42,16 @@ from .constants import \
     CONTROLLER_EVENTS
 
 # Partial imports
-from evdev import ecodes as e, ff, InputDevice, InputEvent, list_devices, UInput
+from evdev import \
+    ecodes as e, \
+    ff, \
+    InputDevice, \
+    InputEvent, \
+    list_devices, \
+    UInput
 from pathlib import Path
 from shutil import move
 from time import sleep
-
-
-def set_handycon(handycon, handheld_controller):
-    handycon = handheld_controller
 
 
 def get_controller(handycon):
@@ -59,11 +61,11 @@ def get_controller(handycon):
     try:
         devices_original = [InputDevice(path) for path in list_devices()]
 
-    except Exception:
+    except Exception as error:
         handycon.logger.error(
             "Error when scanning event devices. Restarting scan."
         )
-        handycon.logger.error(traceback.format_exc())
+        handycon.logger.error(error)
         sleep(DETECT_DELAY)
         return False
 
@@ -104,11 +106,11 @@ def get_keyboard(handycon):
     handycon.logger.debug(f"Attempting to grab {handycon.KEYBOARD_NAME}.")
     try:
         devices_original = [InputDevice(path) for path in list_devices()]
-    except Exception:
+    except Exception as error:
         handycon.logger.error(
             "Error when scanning event devices. Restarting scan."
         )
-        handycon.logger.error(traceback.format_exc())
+        handycon.logger.exception(error)
         sleep(DETECT_DELAY)
         return False
     # Grab the built-in devices.
@@ -288,11 +290,11 @@ async def capture_keyboard_events(handycon):
                         f"Seed Code: {seed_event.code}, "
                         f"Seed Type: {seed_event.type}."
                     )
-                    if active_keys != []:
+                    if active_keys:
                         handycon.logger.debug(f"Active Keys: {active_keys}")
                     else:
                         handycon.logger.debug("No active keys")
-                    if handycon.event_queue != []:
+                    if handycon.event_queue:
                         handycon.logger.debug(
                             f"Queued events: {handycon.event_queue}"
                         )
@@ -407,7 +409,7 @@ async def capture_keyboard_events(handycon):
                                 seed_event,
                                 active_keys
                             )
-                        #case "OXP_GEN5":
+                        # case "OXP_GEN5":
                         #    await oxp_gen5.process_event(
                         #                                 seed_event,
                         #                                 active_keys
@@ -453,11 +455,11 @@ async def capture_keyboard_2_events(handycon):
                         f"Seed Code: {seed_event_2.code}, "
                         f"Seed Type: {seed_event_2.type}."
                     )
-                    if active_keys_2 != []:
+                    if active_keys_2:
                         handycon.logger.debug(f"Active Keys: {active_keys_2}")
                     else:
                         handycon.logger.debug("No active keys")
-                    if handycon.event_queue != []:
+                    if handycon.event_queue:
                         handycon.logger.debug(
                             f"Queued events: {handycon.event_queue}"
                         )
@@ -468,9 +470,9 @@ async def capture_keyboard_2_events(handycon):
                     # and translate them to mapped events.
                     match handycon.system_type:
                         case "ALY_GEN1":
-                           await ally_gen1.process_event(
-                               seed_event_2, active_keys_2
-                           )
+                            await ally_gen1.process_event(
+                                seed_event_2, active_keys_2
+                            )
 
             except Exception as err:
                 handycon.logger.error(
@@ -602,7 +604,7 @@ async def capture_ff_events(handycon):
 
     async for event in handycon.ui_device.async_read_loop():
         if handycon.controller_device is None:
-            # Slow down the loop so we don't waste millions of cycles
+            # Slow down the loop, so we don't waste millions of cycles
             # and overheat our controller.
             await asyncio.sleep(DETECT_DELAY)
             continue
@@ -627,7 +629,7 @@ async def capture_ff_events(handycon):
             effect = upload.effect
 
             if effect.id not in ff_effect_id_set:
-                effect.id = -1 # set to -1 for kernel to allocate a new id.
+                effect.id = -1  # set to -1 for kernel to allocate a new id.
                 # all other values throw an error for invalid input.
 
             try:
@@ -687,6 +689,7 @@ def remove_device(path, event):
         os.remove(str(path / event))
     except FileNotFoundError:
         pass
+
 
 # Emits passed or generated events to the virtual controller.
 # This shouldn't be called directly for custom events,
@@ -815,19 +818,19 @@ async def toggle_performance(handycon):
 
     if handycon.performance_mode == "--max-performance":
         handycon.performance_mode = "--power-saving"
-        await do_rumble(handycon, 0, 100, 1000, 0)
+        await do_rumble(handycon)
         await asyncio.sleep(FF_DELAY)
-        await do_rumble(handycon, 0, 100, 1000, 0)
+        await do_rumble(handycon, interval=100)
     else:
         handycon.performance_mode = "--max-performance"
-        await do_rumble(handycon, 0, 500, 1000, 0)
+        await do_rumble(handycon, interval=500)
         await asyncio.sleep(FF_DELAY)
-        await do_rumble(handycon, 0, 75, 1000, 0)
+        await do_rumble(handycon, interval=75)
         await asyncio.sleep(FF_DELAY)
-        await do_rumble(handycon, 0, 75, 1000, 0)
+        await do_rumble(handycon, interval=75)
 
     ryzenadj_command = f'ryzenadj {handycon.performance_mode}'
-    run = os.popen(ryzenadj_command, 'r', 1).read().strip()
+    run = os.popen(ryzenadj_command, buffering=1).read().strip()
     handycon.logger.debug(run)
 
     if handycon.system_type in ["ALY_GEN1"]:
@@ -838,7 +841,7 @@ async def toggle_performance(handycon):
 
         command = f'echo {handycon.thermal_mode} > ' \
                   f'/sys/devices/platform/asus-nb-wmi/throttle_thermal_policy'
-        run = os.popen(command, 'r', 1).read().strip()
+        os.popen(command, buffering=1).read().strip()
         handycon.logger.debug(f'Thermal mode set to {handycon.thermal_mode}.')
 
 

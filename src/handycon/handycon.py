@@ -87,19 +87,17 @@ class HandheldController:
 
     def __init__(self):
         self.running = True
-        devices.set_handycon(self)
-        utilities.set_handycon(self)
         self.logger.info(
             "Starting Handhend Game Console Controller Service..."
         )
-        if utilities.is_process_running("opengamepadui"):
+        if utilities.is_process_running(self, "opengamepadui"):
             self.logger.warning(
                 "Detected an OpenGamepadUI Process. "
                 "Input management not possible. Exiting."
             )
             exit()
         Path(HIDE_PATH).mkdir(parents=True, exist_ok=True)
-        devices.restore_hidden()
+        devices.restore_hidden(self)
         utilities.get_user(self)
         self.HAS_CHIMERA_LAUNCHER = os.path.isfile(CHIMERA_LAUNCHER_PATH)
         utilities.id_system(self)
@@ -110,13 +108,13 @@ class HandheldController:
         self.loop = asyncio.get_event_loop()
 
         # Attach the event loop of each device to the asyncio loop.
-        asyncio.ensure_future(devices.capture_controller_events())
-        asyncio.ensure_future(devices.capture_ff_events())
-        asyncio.ensure_future(devices.capture_keyboard_events())
+        asyncio.ensure_future(devices.capture_controller_events(self))
+        asyncio.ensure_future(devices.capture_ff_events(self))
+        asyncio.ensure_future(devices.capture_keyboard_events(self))
         if self.KEYBOARD_2_NAME != '' and self.KEYBOARD_2_ADDRESS != '':
-            asyncio.ensure_future(devices.capture_keyboard_2_events())
+            asyncio.ensure_future(devices.capture_keyboard_2_events(self))
 
-        asyncio.ensure_future(devices.capture_power_events())
+        asyncio.ensure_future(devices.capture_power_events(self))
         self.logger.info("Handheld Game Console Controller Service started.")
 
         # Establish signaling to handle gracefull shutdown.
@@ -145,38 +143,32 @@ class HandheldController:
             self.loop.stop()
             sys.exit(exit_code)
 
-    # These functions avoid recursive imports.
-    @staticmethod
-    def steam_ifrunning_deckui(cmd):
-        return utilities.steam_ifrunning_deckui(cmd)
+    # These funct
+    def steam_ifrunning_deckui(self, cmd):
+        return utilities.steam_ifrunning_deckui(self, cmd)
+
+    def launch_chimera(self):
+        utilities.launch_chimera(self)
+
+    def emit_event(self, event):
+        devices.emit_event(self, event)
+
+    async def emit_events(self, events):
+        await devices.emit_events(self, events)
+
+    async def emit_now(self, seed_event, event_list, value):
+        await devices.emit_now(self, seed_event, event_list, value)
+
+    async def do_rumble(self, button=0, interval=10, length=1000, delay=0):
+        await devices.do_rumble(self, button, interval, length, delay)
 
     @staticmethod
-    def launch_chimera():
-        utilities.launch_chimera()
+    async def handle_key_up(self, seed_event, queued_event):
+        await devices.handle_key_up(self, seed_event, queued_event)
 
     @staticmethod
-    def emit_event(event):
-        devices.emit_event(event)
-
-    @staticmethod
-    async def emit_events(events):
-        await devices.emit_events(events)
-
-    @staticmethod
-    async def emit_now(seed_event, event_list, value):
-        await devices.emit_now(seed_event, event_list, value)
-
-    @staticmethod
-    async def do_rumble(button=0, interval=10, length=1000, delay=0):
-        await devices.do_rumble(button, interval, length, delay)
-
-    @staticmethod
-    async def handle_key_up(seed_event, queued_event):
-        await devices.handle_key_up(seed_event, queued_event)
-
-    @staticmethod
-    async def handle_key_down(seed_event, queued_event):
-        await devices.handle_key_down(seed_event, queued_event)
+    async def handle_key_down(self, seed_event, queued_event):
+        await devices.handle_key_down(self, seed_event, queued_event)
 
     # Gracefull shutdown.
     async def exit(self):
