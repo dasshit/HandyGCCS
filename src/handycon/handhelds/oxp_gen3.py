@@ -6,8 +6,7 @@ import os
 from evdev import ecodes as e
 
 
-def init_handheld(handycon, handheld_controller):
-    handycon = handheld_controller
+def init_handheld(handycon):
     handycon.BUTTON_DELAY = 0.11
     handycon.CAPTURE_CONTROLLER = True
     handycon.CAPTURE_KEYBOARD = True
@@ -18,7 +17,7 @@ def init_handheld(handycon, handheld_controller):
     handycon.KEYBOARD_NAME = 'AT Translated Set 2 keyboard'
     if os.path.exists('/sys/devices/platform/oxp-platform/tt_toggle'):
         command = 'echo 1 > /sys/devices/platform/oxp-platform/tt_toggle'
-        os.popen(command, 'r', 1).read().strip()
+        os.popen(command, buffering=1).read().strip()
         handycon.logger.info('Turbo button takeover enabled')
 
 

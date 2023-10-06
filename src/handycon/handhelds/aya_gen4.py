@@ -5,8 +5,7 @@
 from evdev import ecodes as e
 
 
-def init_handheld(handycon, handheld_controller):
-    handycon = handheld_controller
+def init_handheld(handycon):
     handycon.BUTTON_DELAY = 0.11
     handycon.CAPTURE_CONTROLLER = True
     handycon.CAPTURE_KEYBOARD = True
@@ -26,7 +25,7 @@ async def process_event(handycon, seed_event, active_keys):
     button4 = handycon.button_map["button4"]  # Default OSK
     button5 = handycon.button_map["button5"]  # Default MODE
 
-    ## Loop variables
+    # Loop variables
     button_on = seed_event.value
 
     # Automatically pass default keycodes we dont intend to replace.

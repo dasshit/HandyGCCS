@@ -3,8 +3,7 @@
 # Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
 
 
-def init_handheld(handycon, handheld_controller):
-    handycon = handheld_controller
+def init_handheld(handycon):
     handycon.BUTTON_DELAY = 0.2
     handycon.CAPTURE_CONTROLLER = True
     handycon.CAPTURE_KEYBOARD = True
@@ -109,8 +108,10 @@ async def process_event(handycon, seed_event, active_keys):
         this_button = button6
 
     # BUTTON 7 (Default: Toggle Performance) Armory Crate Button Long Press
-    # This button triggers immediate down/up after holding for ~1s an F17 and then
-    # released another down/up for F18 on release. We use the F18 "KEY_UP" for release.
+    # This button triggers immediate down/up
+    # after holding for ~1s an F17 and then
+    # released another down/up for F18 on release.
+    # We use the F18 "KEY_UP" for release.
     if active_keys == [187] \
             and button_on == 1 \
             and button7 not in handycon.event_queue:

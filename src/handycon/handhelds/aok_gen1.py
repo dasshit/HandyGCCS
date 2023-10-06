@@ -5,8 +5,7 @@
 import os
 from evdev import ecodes as e
 
-def init_handheld(handycon, handheld_controller):
-    handycon = handheld_controller
+def init_handheld(handycon):
     handycon.BUTTON_DELAY = 0.09
     handycon.CAPTURE_CONTROLLER = True
     handycon.CAPTURE_KEYBOARD = True
