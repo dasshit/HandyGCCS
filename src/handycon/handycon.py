@@ -229,4 +229,4 @@ class HandheldController:
 
 
 def main():
-    HandheldController()
+    handycon = HandheldController()
