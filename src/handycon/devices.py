@@ -48,6 +48,10 @@ from shutil import move
 from time import sleep
 
 
+def set_handycon(handycon, handheld_controller):
+    handycon = handheld_controller
+
+
 def get_controller(handycon):
 
     # Identify system input event devices.
