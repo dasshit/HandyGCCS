@@ -5,6 +5,20 @@
 
 def init_handheld(handycon):
     # Captures keyboard events and translates them to virtual device events.
+
+    handycon.BUTTON_DELAY = 0.2
+    handycon.CAPTURE_CONTROLLER = True
+    handycon.CAPTURE_KEYBOARD = True
+    handycon.CAPTURE_POWER = True
+    handycon.GAMEPAD_ADDRESS = 'usb-0000:0a:00.3-2/input0'
+    handycon.GAMEPAD_NAME = 'Microsoft X-Box 360 pad'
+    handycon.KEYBOARD_ADDRESS = 'usb-0000:0a:00.3-3/input0'
+    handycon.KEYBOARD_NAME = 'Asus Keyboard'
+    handycon.KEYBOARD_2_ADDRESS = 'usb-0000:0a:00.3-3/input2'
+    handycon.KEYBOARD_2_NAME = 'Asus Keyboard'
+    # setattr(handycon, 'process_event', process_event)
+
+
     async def process_event(
             handycon,
             seed_event,
@@ -188,15 +202,3 @@ def init_handheld(handycon):
         elif handycon.last_button and not this_button:
             await handycon.emit_now(seed_event, handycon.last_button, 0)
             handycon.last_button = None
-
-    handycon.BUTTON_DELAY = 0.2
-    handycon.CAPTURE_CONTROLLER = True
-    handycon.CAPTURE_KEYBOARD = True
-    handycon.CAPTURE_POWER = True
-    handycon.GAMEPAD_ADDRESS = 'usb-0000:0a:00.3-2/input0'
-    handycon.GAMEPAD_NAME = 'Microsoft X-Box 360 pad'
-    handycon.KEYBOARD_ADDRESS = 'usb-0000:0a:00.3-3/input0'
-    handycon.KEYBOARD_NAME = 'Asus Keyboard'
-    handycon.KEYBOARD_2_ADDRESS = 'usb-0000:0a:00.3-3/input2'
-    handycon.KEYBOARD_2_NAME = 'Asus Keyboard'
-    setattr(handycon, 'process_event', process_event)
