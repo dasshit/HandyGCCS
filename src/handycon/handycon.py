@@ -11,28 +11,35 @@ import sys
 import traceback
 import warnings
 
-## Local modules
-from .constants import *
+# Local modules
+from .constants import \
+    CHIMERA_LAUNCHER_PATH, \
+    HIDE_PATH
 from . import devices
 from . import utilities
 
-## Partial imports
+# Partial imports
 from pathlib import Path
 
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+
 class HandheldController:
     # Logging
-    logging.basicConfig(format="[%(asctime)s | %(filename)s:%(lineno)s:%(funcName)s] %(message)s",
-                        datefmt="%y%m%d_%H:%M:%S",
-                        level=logging.INFO
-                        )
-    logger= logging.getLogger(__name__)
+    logging.basicConfig(
+        format="%(asctime)s |"
+               " %(filename)s:%(lineno)s:%(funcName)s |"
+               " %(message)s",
+        datefmt="%y%m%d_%H:%M:%S",
+        level=logging.INFO
+    )
+    logger = logging.getLogger(__name__)
 
     # Session Variables
     config = None
     button_map = {}
-    event_queue = [] # Stores inng button presses to block spam
+    event_queue = []  # Stores inng button presses to block spam
     last_button = None
     last_x_val = 0
     last_y_val = 0
@@ -82,14 +89,19 @@ class HandheldController:
         self.running = True
         devices.set_handycon(self)
         utilities.set_handycon(self)
-        self.logger.info("Starting Handhend Game Console Controller Service...")
+        self.logger.info(
+            "Starting Handhend Game Console Controller Service..."
+        )
         if utilities.is_process_running("opengamepadui"):
-            self.logger.warn("Detected an OpenGamepadUI Process. Input management not possible. Exiting.")
+            self.logger.warning(
+                "Detected an OpenGamepadUI Process. "
+                "Input management not possible. Exiting."
+            )
             exit()
         Path(HIDE_PATH).mkdir(parents=True, exist_ok=True)
-        devices.restore_hidden() 
+        devices.restore_hidden()
         utilities.get_user()
-        self.HAS_CHIMERA_LAUNCHER=os.path.isfile(CHIMERA_LAUNCHER_PATH)
+        self.HAS_CHIMERA_LAUNCHER = os.path.isfile(CHIMERA_LAUNCHER_PATH)
         utilities.id_system()
         utilities.get_config()
         devices.make_controller()
@@ -108,12 +120,20 @@ class HandheldController:
         self.logger.info("Handheld Game Console Controller Service started.")
 
         # Establish signaling to handle gracefull shutdown.
-        for s in (signal.SIGHUP, signal.SIGTERM, signal.SIGINT, signal.SIGQUIT):
-            self.loop.add_signal_handler(s, lambda s=s: asyncio.create_task(self.exit()))
+        for recv_signal in (
+                signal.SIGHUP,
+                signal.SIGTERM,
+                signal.SIGINT,
+                signal.SIGQUIT
+        ):
+            self.loop.add_signal_handler(
+                recv_signal,
+                lambda s: asyncio.create_task(self.exit())
+            )
 
+        exit_code = 0
         try:
             self.loop.run_forever()
-            exit_code = 0
         except KeyboardInterrupt:
             self.logger.info("Keyboard interrupt.")
             exit_code = 1
@@ -126,28 +146,36 @@ class HandheldController:
             sys.exit(exit_code)
 
     # These functions avoid recursive imports.
-    def steam_ifrunning_deckui(self, cmd):
+    @staticmethod
+    def steam_ifrunning_deckui(cmd):
         return utilities.steam_ifrunning_deckui(cmd)
 
-    def launch_chimera(self):
+    @staticmethod
+    def launch_chimera():
         utilities.launch_chimera()
 
-    def emit_event(self, event):
+    @staticmethod
+    def emit_event(event):
         devices.emit_event(event)
 
-    async def emit_events(self, events):
+    @staticmethod
+    async def emit_events(events):
         await devices.emit_events(events)
 
-    async def emit_now(self, seed_event, event_list, value):
+    @staticmethod
+    async def emit_now(seed_event, event_list, value):
         await devices.emit_now(seed_event, event_list, value)
 
-    async def do_rumble(self, button=0, interval=10, length=1000, delay=0):
+    @staticmethod
+    async def do_rumble(button=0, interval=10, length=1000, delay=0):
         await devices.do_rumble(button, interval, length, delay)
 
-    async def handle_key_up(self, seed_event, queued_event):
+    @staticmethod
+    async def handle_key_up(seed_event, queued_event):
         await devices.handle_key_up(seed_event, queued_event)
 
-    async def handle_key_down(self, seed_event, queued_event):
+    @staticmethod
+    async def handle_key_down(seed_event, queued_event):
         await devices.handle_key_down(seed_event, queued_event)
 
     # Gracefull shutdown.
@@ -158,35 +186,39 @@ class HandheldController:
         if self.controller_device:
             try:
                 self.controller_device.ungrab()
-            except IOError as err:
+            except IOError:
                 pass
             devices.restore_device(self.controller_event, self.controller_path)
         if self.keyboard_device:
             try:
                 self.keyboard_device.ungrab()
-            except IOError as err:
+            except IOError:
                 pass
             devices.restore_device(self.keyboard_event, self.keyboard_path)
         if self.keyboard_2_device:
             try:
                 self.keyboard_2_device.ungrab()
-            except IOError as err:
+            except IOError:
                 pass
             devices.restore_device(self.keyboard_2_event, self.keyboard_2_path)
         if self.power_device and self.CAPTURE_POWER:
             try:
                 self.power_device.ungrab()
-            except IOError as err:
+            except IOError:
                 pass
         if self.power_device_2 and self.CAPTURE_POWER:
             try:
                 self.power_device_2.ungrab()
-            except IOError as err:
+            except IOError:
                 pass
         self.logger.info("Devices restored.")
 
         # Kill all tasks. They are infinite loops so we will wait forver.
-        for task in [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]:
+        for task in [
+            t
+            for t in asyncio.all_tasks()
+            if t is not asyncio.current_task()
+        ]:
             task.cancel()
             try:
                 await task
@@ -197,4 +229,4 @@ class HandheldController:
 
 
 def main():
-    handycon = HandheldController()
+    HandheldController()

@@ -30,13 +30,16 @@ def capture_system():
     # Identify the current device type. Kill script if not compatible.
     sys_id = open("/sys/devices/virtual/dmi/id/product_name", "r").read().strip()
 
-
     # Identify system input event devices.
     devices = [InputDevice(path) for path in list_devices()]
     for device in devices:
         
         # Xbox 360 Controller
-        if device.name in ['Microsoft X-Box 360 pad', 'Generic X-Box pad', 'OneXPlayer Gamepad',]:
+        if device.name in [
+            'Microsoft X-Box 360 pad',
+            'Generic X-Box pad',
+            'OneXPlayer Gamepad'
+        ]:
             xb_path = device.path
 
         # Keyboard Device

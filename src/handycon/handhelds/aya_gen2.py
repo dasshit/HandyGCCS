@@ -2,10 +2,8 @@
 # This file is part of Handheld Game Console Controller System (HandyGCCS)
 # Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
 
-import sys
-from evdev import InputDevice, InputEvent, UInput, ecodes as e, list_devices, ff
+from evdev import ecodes as e
 
-from .. import constants as cons
 
 handycon = None
 
@@ -38,19 +36,33 @@ async def process_event(seed_event, active_keys):
         handycon.emit_event(seed_event)
 
     # BUTTON 2 (Default: QAM) Small Button
-    if active_keys in [[40, 133], [32, 125]] and button_on == 1 and button2 not in handycon.event_queue:
+    if active_keys in [[40, 133], [32, 125]] \
+            and button_on == 1 \
+            and button2 not in handycon.event_queue:
         await handycon.handle_key_down(seed_event, button2)
-    elif active_keys == [] and seed_event.code in [32, 40, 125, 133] and button_on == 0 and button2 in handycon.event_queue:
+    elif active_keys == [] \
+            and seed_event.code in [32, 40, 125, 133] \
+            and button_on == 0 \
+            and button2 in handycon.event_queue:
         await handycon.handle_key_up(seed_event, button2)
 
     # BUTTON 5 (Default: MODE) Big button
-    if active_keys in [[96, 105, 133], [88, 97, 125]] and button_on == 1 and button5 not in handycon.event_queue:
+    if active_keys in [[96, 105, 133], [88, 97, 125]] \
+            and button_on == 1 \
+            and button5 not in handycon.event_queue:
         await handycon.handle_key_down(seed_event, button5)
-    elif active == [] and seed_event.code in [88, 96, 97, 105, 125, 133] and button_on == 0 and button5 in handycon.event_queue:
+    elif active_keys == [] \
+            and seed_event.code in [88, 96, 97, 105, 125, 133] \
+            and button_on == 0 \
+            and button5 in handycon.event_queue:
         await handycon.handle_key_up(seed_event, button5)
 
     # Handle L_META from power button
-    elif active_keys == [] and seed_event.code == 125 and button_on == 0 and handycon.event_queue == [] and handycon.shutdown == True:
+    elif active_keys == [] \
+            and seed_event.code == 125 \
+            and button_on == 0 \
+            and handycon.event_queue == [] \
+            and handycon.shutdown is True:
         handycon.shutdown = False
 
     if handycon.last_button:

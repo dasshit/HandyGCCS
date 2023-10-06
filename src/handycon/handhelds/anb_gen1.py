@@ -2,10 +2,8 @@
 # This file is part of Handheld Game Console Controller System (HandyGCCS)
 # Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
 
-import sys
-from evdev import InputDevice, InputEvent, UInput, ecodes as e, list_devices, ff
+from evdev import ecodes as e
 
-from .. import constants as cons
 
 handycon = None
 
@@ -47,48 +45,77 @@ async def process_event(seed_event, active_keys):
         this_button = handycon.event_queue[0]
 
     # BUTTON 1 (BUTTON 4 ALT Mode) (Default: Screenshot) Long press KB
-    if active_keys == [24, 29, 125] and button_on == 2 and button1 not in handycon.event_queue:
+    if active_keys == [24, 29, 125] \
+            and button_on == 2 \
+            and button1 not in handycon.event_queue:
         if button4 in handycon.event_queue:
             handycon.event_queue.remove(button4)
         if button5 in handycon.event_queue:
             handycon.event_queue.remove(button5)
         handycon.event_queue.append(button1)
-    elif active_keys == [] and seed_event.code in [24, 29, 125] and button_on == 0 and button1 in handycon.event_queue:
+    elif active_keys == [] \
+            and seed_event.code in [24, 29, 125] \
+            and button_on == 0 \
+            and button1 in handycon.event_queue:
         this_button = button1
 
     # BUTTON 2 (Default: QAM) Home key.
-    if active_keys == [125] and button_on == 1 and button2 not in handycon.event_queue:
+    if active_keys == [125] \
+            and button_on == 1 \
+            and button2 not in handycon.event_queue:
         if button5 in handycon.event_queue:
             handycon.event_queue.remove(button5)
         handycon.event_queue.append(button2)
-    elif active_keys == [] and seed_event.code in [125] and button_on == 0 and button2 in handycon.event_queue:
+    elif active_keys == [] \
+            and seed_event.code in [125] \
+            and button_on == 0 \
+            and button2 in handycon.event_queue:
         this_button = button2
 
     # BUTTON 3, BUTTON 2 ALt mode (Defalt ESC)
-    elif active_keys == [1] and button_on == 1 and button3 not in handycon.event_queue:
+    elif active_keys == [1] \
+            and button_on == 1 \
+            and button3 not in handycon.event_queue:
         if button2 in handycon.event_queue:
             handycon.event_queue.remove(button2)
         handycon.event_queue.append(button3)
         await handycon.do_rumble(0, 75, 1000, 0)
-    elif active_keys == [] and seed_event.code == 1 and button_on == 0 and button3 in handycon.event_queue:
+    elif active_keys == [] \
+            and seed_event.code == 1 \
+            and button_on == 0 \
+            and button3 in handycon.event_queue:
         this_button = button3
 
     # BUTTON 4 (Default: OSK) Short press KB
-    if active_keys == [24, 29, 125] and button_on == 1 and button4 not in handycon.event_queue:
+    if active_keys == [24, 29, 125] \
+            and button_on == 1 \
+            and button4 not in handycon.event_queue:
         if button5 in handycon.event_queue:
             handycon.event_queue.remove(button5)
         handycon.event_queue.append(button4)
-    elif active_keys == [] and seed_event.code in [24, 29, 125] and button_on == 0 and button4 in handycon.event_queue:
+    elif active_keys == [] \
+            and seed_event.code in [24, 29, 125] \
+            and button_on == 0 \
+            and button4 in handycon.event_queue:
         this_button = button4
 
     # BUTTON 5 (Default: GUIDE) Meta/Windows key.
-    if active_keys == [34, 125] and button_on == 1 and button5 not in handycon.event_queue:
+    if active_keys == [34, 125] \
+            and button_on == 1 \
+            and button5 not in handycon.event_queue:
         handycon.event_queue.append(button5)
-    elif active_keys == [] and seed_event.code in [34, 125] and button_on == 0 and button5 in handycon.event_queue:
+    elif active_keys == [] \
+            and seed_event.code in [34, 125] \
+            and button_on == 0 \
+            and button5 in handycon.event_queue:
         this_button = button5
 
     # Handle L_META from power button
-    elif active_keys == [] and seed_event.code == 125 and button_on == 0 and  handycon.event_queue == [] and handycon.shutdown == True:
+    elif active_keys == [] \
+            and seed_event.code == 125 \
+            and button_on == 0 \
+            and handycon.event_queue == [] \
+            and handycon.shutdown is True:
         handycon.shutdown = False
 
     # Create list of events to fire.

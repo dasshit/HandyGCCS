@@ -1,5 +1,5 @@
 #!/bin/bash
-rm -rf build dist src/handycon.egg-info
+rm -rf build dist handycon.egg-info
 sudo rm -rf /usr/lib/python3*/site-packages/handycon*
 sudo rm /usr/bin/handycon
 sudo rm -rf /usr/share/handygccs

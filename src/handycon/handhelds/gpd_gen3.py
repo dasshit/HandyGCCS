@@ -2,10 +2,8 @@
 # This file is part of Handheld Game Console Controller System (HandyGCCS)
 # Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
 
-import sys
-from evdev import InputDevice, InputEvent, UInput, ecodes as e, list_devices, ff
+from evdev import ecodes as e
 
-from .. import constants as cons
 
 handycon = None
 
@@ -36,19 +34,33 @@ async def process_event(seed_event, active_keys):
         handycon.emit_event(seed_event)
 
     # BUTTON 1 (Default: Toggle Gyro)
-    if active_keys == [119] and button_on == 1 and button1 not in handycon.event_queue:
+    if active_keys == [119] \
+            and button_on == 1 \
+            and button1 not in handycon.event_queue:
         await handycon.handle_key_down(seed_event, button1)
-    elif active_keys == [] and seed_event.code in [119] and button_on == 0 and button1 in handycon.event_queue:
+    elif active_keys == [] \
+            and seed_event.code in [119] \
+            and button_on == 0 \
+            and button1 in handycon.event_queue:
         await handycon.handle_key_up(seed_event, button1)
 
     # BUTTON 2 (Default: QAM)
-    if active_keys == [99] and button_on == 1 and button2 not in handycon.event_queue:
+    if active_keys == [99] \
+            and button_on == 1 \
+            and button2 not in handycon.event_queue:
         await handycon.handle_key_down(seed_event, button2)
-    elif active_keys == [] and seed_event.code in [99] and button_on == 0 and button2 in handycon.event_queue:
+    elif active_keys == [] \
+            and seed_event.code in [99] \
+            and button_on == 0 \
+            and button2 in handycon.event_queue:
         await handycon.handle_key_up(seed_event, button2)
 
     # Handle L_META from power button
-    elif active_keys == [] and seed_event.code == 125 and button_on == 0 and  handycon.event_queue == [] and handycon.shutdown == True:
+    elif active_keys == [] \
+            and seed_event.code == 125 \
+            and button_on == 0 \
+            and handycon.event_queue == [] \
+            and handycon.shutdown is True:
         handycon.shutdown = False
 
     if handycon.last_button:
