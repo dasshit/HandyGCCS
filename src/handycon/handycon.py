@@ -843,11 +843,144 @@ class HandheldController:
 
                         # Capture keyboard events
                         # and translate them to mapped events.
-                        if self.system_type == 'ALY_GEN1':
-                            await self.process_event(
-                                seed_event,
-                                active_keys
-                            )
+                        match self.system_type:
+                            case "ALY_GEN1":
+                                await ally_gen1.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "ANB_GEN1":
+                                await anb_gen1.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "AOK_GEN1":
+                                await aok_gen1.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "AOK_GEN2":
+                                await aok_gen2.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "AYA_GEN1":
+                                await aya_gen1.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "AYA_GEN2":
+                                await aya_gen2.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "AYA_GEN3":
+                                await aya_gen3.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "AYA_GEN4":
+                                await aya_gen4.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "AYA_GEN5":
+                                await aya_gen5.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "AYA_GEN6":
+                                await aya_gen6.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "AYA_GEN7":
+                                await aya_gen7.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "AYN_GEN1":
+                                await ayn_gen1.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "AYN_GEN2":
+                                await ayn_gen2.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "AYN_GEN3":
+                                await ayn_gen3.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "GPD_GEN1":
+                                await gpd_gen1.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "GPD_GEN2":
+                                await gpd_gen2.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "GPD_GEN3":
+                                await gpd_gen3.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "OXP_GEN1":
+                                await oxp_gen1.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "OXP_GEN2":
+                                await oxp_gen2.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "OXP_GEN3":
+                                await oxp_gen3.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            case "OXP_GEN4":
+                                await oxp_gen4.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
+                            # case "OXP_GEN5":
+                            #    await oxp_gen5.process_event(
+                            #                                 seed_event,
+                            #                                 active_keys
+                            #                             )
+                            case "OXP_GEN6":
+                                await oxp_gen6.process_event(
+                                    self,
+                                    seed_event,
+                                    active_keys
+                                )
 
                 except Exception as err:
                     self.logger.error(
@@ -897,11 +1030,13 @@ class HandheldController:
 
                         # Capture keyboard events
                         # and translate them to mapped events.
-                        if self.system_type == 'ALY_GEN1':
-                            await self.process_event(
-                                seed_event_2,
-                                active_keys_2
-                            )
+                        match self.system_type:
+                            case "ALY_GEN1":
+                                await ally_gen1.process_event(
+                                    self,
+                                    seed_event_2,
+                                    active_keys_2
+                                )
 
                 except Exception as err:
                     self.logger.error(
