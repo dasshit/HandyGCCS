@@ -897,10 +897,11 @@ class HandheldController:
 
                         # Capture keyboard events
                         # and translate them to mapped events.
-                        await self.process_event(
-                            seed_event_2,
-                            active_keys_2
-                        )
+                        if self.system_type == 'ALY_GEN1':
+                            await self.process_event(
+                                seed_event_2,
+                                active_keys_2
+                            )
 
                 except Exception as err:
                     self.logger.error(
