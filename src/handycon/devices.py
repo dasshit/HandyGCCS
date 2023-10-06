@@ -8,29 +8,29 @@ import os
 import traceback
 
 # Local modules
-from . import \
-    handycon as ally_gen1, \
-    handycon as anb_gen1, \
-    handycon as aok_gen1, \
-    handycon as aok_gen2, \
-    handycon as aya_gen1, \
-    handycon as aya_gen2, \
-    handycon as aya_gen3, \
-    handycon as aya_gen4, \
-    handycon as aya_gen5, \
-    handycon as aya_gen6, \
-    handycon as aya_gen7, \
-    handycon as ayn_gen1, \
-    handycon as ayn_gen2, \
-    handycon as ayn_gen3, \
-    handycon as gpd_gen1, \
-    handycon as gpd_gen2, \
-    handycon as gpd_gen3, \
-    handycon as oxp_gen1, \
-    handycon as oxp_gen2, \
-    handycon as oxp_gen3, \
-    handycon as oxp_gen4, \
-    handycon as oxp_gen6
+from .handhelds import \
+    ally_gen1, \
+    anb_gen1, \
+    aok_gen1, \
+    aok_gen2, \
+    aya_gen1, \
+    aya_gen2, \
+    aya_gen3, \
+    aya_gen4, \
+    aya_gen5, \
+    aya_gen6, \
+    aya_gen7, \
+    ayn_gen1, \
+    ayn_gen2, \
+    ayn_gen3, \
+    gpd_gen1, \
+    gpd_gen2, \
+    gpd_gen3, \
+    oxp_gen1, \
+    oxp_gen2, \
+    oxp_gen3, \
+    oxp_gen4, \
+    oxp_gen6
 
 # import handycon.handhelds.oxp_gen5 as oxp_gen5
 from .constants import \
@@ -306,106 +306,127 @@ async def capture_keyboard_events(handycon):
                     match handycon.system_type:
                         case "ALY_GEN1":
                             await ally_gen1.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "ANB_GEN1":
                             await anb_gen1.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "AOK_GEN1":
                             await aok_gen1.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "AOK_GEN2":
                             await aok_gen2.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "AYA_GEN1":
                             await aya_gen1.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "AYA_GEN2":
                             await aya_gen2.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "AYA_GEN3":
                             await aya_gen3.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "AYA_GEN4":
                             await aya_gen4.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "AYA_GEN5":
                             await aya_gen5.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "AYA_GEN6":
                             await aya_gen6.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "AYA_GEN7":
                             await aya_gen7.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "AYN_GEN1":
                             await ayn_gen1.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "AYN_GEN2":
                             await ayn_gen2.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "AYN_GEN3":
                             await ayn_gen3.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "GPD_GEN1":
                             await gpd_gen1.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "GPD_GEN2":
                             await gpd_gen2.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "GPD_GEN3":
                             await gpd_gen3.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "OXP_GEN1":
                             await oxp_gen1.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "OXP_GEN2":
                             await oxp_gen2.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "OXP_GEN3":
                             await oxp_gen3.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
                         case "OXP_GEN4":
                             await oxp_gen4.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
@@ -416,6 +437,7 @@ async def capture_keyboard_events(handycon):
                         #                             )
                         case "OXP_GEN6":
                             await oxp_gen6.process_event(
+                                handycon,
                                 seed_event,
                                 active_keys
                             )
@@ -471,7 +493,9 @@ async def capture_keyboard_2_events(handycon):
                     match handycon.system_type:
                         case "ALY_GEN1":
                             await ally_gen1.process_event(
-                                seed_event_2, active_keys_2
+                                handycon,
+                                seed_event_2,
+                                active_keys_2
                             )
 
             except Exception as err:
