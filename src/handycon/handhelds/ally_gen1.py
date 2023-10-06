@@ -10,6 +10,7 @@ def init_handheld(handycon):
             seed_event,
             active_keys
     ):
+        handycon.logger.debug('[ally_gen1][process_event]')
         # Button map shortcuts for easy reference.
         button1 = handycon.button_map["button1"]  # Default Screenshot
         button2 = handycon.button_map["button2"]  # Default QAM
