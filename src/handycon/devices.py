@@ -8,14 +8,29 @@ import os
 import traceback
 
 # Local modules
-from . import handycon as ally_gen1, handycon as anb_gen1, \
-    handycon as aok_gen1, handycon as aok_gen2, handycon as aya_gen1, \
-    handycon as aya_gen2, handycon as aya_gen3, handycon as aya_gen4, \
-    handycon as aya_gen5, handycon as aya_gen6, handycon as aya_gen7, \
-    handycon as ayn_gen1, handycon as ayn_gen2, handycon as ayn_gen3, \
-    handycon as gpd_gen1, handycon as gpd_gen2, handycon as gpd_gen3, \
-    handycon as oxp_gen1, handycon as oxp_gen2, handycon as oxp_gen3, \
-    handycon as oxp_gen4, handycon as oxp_gen6
+from . import \
+    handycon as ally_gen1, \
+    handycon as anb_gen1, \
+    handycon as aok_gen1, \
+    handycon as aok_gen2, \
+    handycon as aya_gen1, \
+    handycon as aya_gen2, \
+    handycon as aya_gen3, \
+    handycon as aya_gen4, \
+    handycon as aya_gen5, \
+    handycon as aya_gen6, \
+    handycon as aya_gen7, \
+    handycon as ayn_gen1, \
+    handycon as ayn_gen2, \
+    handycon as ayn_gen3, \
+    handycon as gpd_gen1, \
+    handycon as gpd_gen2, \
+    handycon as gpd_gen3, \
+    handycon as oxp_gen1, \
+    handycon as oxp_gen2, \
+    handycon as oxp_gen3, \
+    handycon as oxp_gen4, \
+    handycon as oxp_gen6
 
 # import handycon.handhelds.oxp_gen5 as oxp_gen5
 from .constants import \
@@ -32,15 +47,8 @@ from pathlib import Path
 from shutil import move
 from time import sleep
 
-handycon = None
 
-def set_handycon(handheld_controller):
-    global handycon
-    handycon = handheld_controller
-
-
-def get_controller():
-    global handycon
+def get_controller(handycon):
 
     # Identify system input event devices.
     handycon.logger.debug(f"Attempting to grab {handycon.GAMEPAD_NAME}.")
@@ -86,8 +94,7 @@ def get_controller():
         return True
 
 
-def get_keyboard():
-    global handycon
+def get_keyboard(handycon):
 
     # Identify system input event devices.
     handycon.logger.debug(f"Attempting to grab {handycon.KEYBOARD_NAME}.")
@@ -130,8 +137,7 @@ def get_keyboard():
         return True
 
 
-def get_keyboard_2():
-    global handycon
+def get_keyboard_2(handycon):
 
     handycon.logger.debug(f"Attempting to grab {handycon.KEYBOARD_2_NAME}.")
     try:
@@ -176,17 +182,18 @@ def get_keyboard_2():
         return True
 
 
-def get_powerkey():
-    global handycon
+def get_powerkey(handycon):
 
     handycon.logger.debug("Attempting to grab power buttons.")
     # Identify system input event devices.
     try:
         devices_original = [InputDevice(path) for path in list_devices()]
     # Some funky stuff happens sometimes when booting. Give it another shot.
-    except Exception:
-        handycon.logger.error("Error when scanning event devices. Restarting scan.")
-        handycon.logger.error(traceback.format_exc())
+    except Exception as error:
+        handycon.logger.error(
+            "Error when scanning event devices. Restarting scan."
+        )
+        handycon.logger.exception(error)
         sleep(DETECT_DELAY)
         return False
 
@@ -200,7 +207,9 @@ def get_powerkey():
                 and device.phys == handycon.POWER_BUTTON_PRIMARY \
                 and not handycon.power_device:
             handycon.power_device = device
-            handycon.logger.debug(f"found power device {handycon.power_device.phys}")
+            handycon.logger.debug(
+                f"found power device {handycon.power_device.phys}"
+            )
             if handycon.CAPTURE_POWER:
                 handycon.power_device.grab()
 
@@ -233,8 +242,7 @@ def get_powerkey():
         return True
 
 
-async def do_rumble(button=0, interval=10, length=1000, delay=0):
-    global handycon
+async def do_rumble(handycon, button=0, interval=10, length=1000, delay=0):
 
     # Prevent look crash if controller_device was taken.
     if not handycon.controller_device:
@@ -259,14 +267,14 @@ async def do_rumble(button=0, interval=10, length=1000, delay=0):
 
 
 # Captures keyboard events and translates them to virtual device events.
-async def capture_keyboard_events():
-    global handycon
+async def capture_keyboard_events(handycon):
 
     # Capture keyboard events and translate them to mapped events.
     while handycon.running:
         if handycon.keyboard_device:
             try:
-                async for seed_event in handycon.keyboard_device.async_read_loop():
+                async for seed_event \
+                        in handycon.keyboard_device.async_read_loop():
                     # Loop variables
                     active_keys = handycon.keyboard_device.active_keys()
 
@@ -419,13 +427,12 @@ async def capture_keyboard_events():
                 handycon.keyboard_path = None
         else:
             handycon.logger.info("Attempting to grab keyboard device...")
-            get_keyboard()
+            get_keyboard(handycon)
             await asyncio.sleep(DETECT_DELAY)
 
 
 # Captures keyboard events and translates them to virtual device events.
-async def capture_keyboard_2_events():
-    global handycon
+async def capture_keyboard_2_events(handycon):
 
     # Capture keyboard events and translate them to mapped events.
     while handycon.running:
@@ -464,7 +471,8 @@ async def capture_keyboard_2_events():
             except Exception as err:
                 handycon.logger.error(
                     f"{err} | "
-                    f"Error reading events from {handycon.keyboard_2_device.name}"
+                    f"Error reading events "
+                    f"from {handycon.keyboard_2_device.name}"
                 )
                 handycon.logger.error(traceback.format_exc())
                 remove_device(HIDE_PATH, handycon.keyboard_2_event)
@@ -473,25 +481,25 @@ async def capture_keyboard_2_events():
                 handycon.keyboard_2_path = None
         else:
             handycon.logger.info("Attempting to grab keyboard device 2...")
-            get_keyboard_2()
+            get_keyboard_2(handycon)
             await asyncio.sleep(DETECT_DELAY)
 
 
-async def capture_controller_events():
-    global handycon
+async def capture_controller_events(handycon):
 
     handycon.logger.debug(f"capture_controller_events, {handycon.running}")
     while handycon.running:
         if handycon.controller_device:
             try:
-                async for event in handycon.controller_device.async_read_loop():
+                async for event in \
+                        handycon.controller_device.async_read_loop():
                     # Block FF events, or get infinite recursion.
                     # Up to you I guess...
                     if event.type in [e.EV_FF, e.EV_UINPUT]:
                         continue
 
                     # Output the event.
-                    emit_event(event)
+                    emit_event(handycon, event)
             except Exception as err:
                 handycon.logger.error(
                     f"{err} | "
@@ -505,13 +513,12 @@ async def capture_controller_events():
                 handycon.controller_path = None
         else:
             handycon.logger.info("Attempting to grab controller device...")
-            get_controller()
+            get_controller(handycon)
             await asyncio.sleep(DETECT_DELAY)
 
 
 # Captures power events and handles long or short press events.
-async def capture_power_events():
-    global handycon
+async def capture_power_events(handycon):
 
     while handycon.running:
         if handycon.power_device:
@@ -524,7 +531,7 @@ async def capture_power_events():
                     if event.type == e.EV_KEY and event.code == 116:
                         # KEY_POWER
                         if event.value == 0:
-                            handle_power_action()
+                            handle_power_action(handycon)
 
             except Exception as err:
                 handycon.logger.error(
@@ -543,7 +550,7 @@ async def capture_power_events():
                     if event.type == e.EV_KEY and event.code == 116:
                         # KEY_POWER
                         if event.value == 0:
-                            handle_power_action()
+                            handle_power_action(handycon)
 
             except Exception as err:
                 handycon.logger.error(
@@ -554,12 +561,12 @@ async def capture_power_events():
 
         else:
             handycon.logger.info("Attempting to grab controller device...")
-            get_powerkey()
+            get_powerkey(handycon)
             await asyncio.sleep(DETECT_DELAY)
 
 
 # Performs specific power actions based on user config.
-def handle_power_action():
+def handle_power_action(handycon):
     handycon.logger.debug(f"Power Action: {handycon.power_action}")
     match handycon.power_action:
         case "Suspend":
@@ -583,9 +590,9 @@ def handle_power_action():
             if not is_deckui:
                 os.system('systemctl poweroff')
 
+
 # Handle FF event uploads
-async def capture_ff_events():
-    global handycon
+async def capture_ff_events(handycon):
 
     ff_effect_id_set = set()
 
@@ -662,7 +669,7 @@ def restore_device(event, path):
         pass
 
 
-def restore_hidden():
+def restore_hidden(handycon):
     hidden_events = os.listdir(HIDE_PATH)
     if len(hidden_events) == 0:
         return
@@ -681,10 +688,10 @@ def remove_device(path, event):
 # This shouldn't be called directly for custom events,
 # only to pass realtime events.
 # Use emit_now and the device's event_queue.
-async def emit_events(events: list):
+async def emit_events(handycon, events: list):
 
     for event in events:
-        emit_event(event)
+        emit_event(handycon, event)
         # Pause between multiple events,
         # but not after the last one in the list.
         if event != events[len(events)-1]:
@@ -692,8 +699,7 @@ async def emit_events(events: list):
 
 
 # Emit a single event. Skips some logic checks for optimization.
-def emit_event(event):
-    global handycon
+def emit_event(handycon, event):
     handycon.logger.debug(f"Emitting event: {event}")
     handycon.ui_device.write_event(event)
     handycon.ui_device.syn()
@@ -702,8 +708,7 @@ def emit_event(event):
 # Generates events from an event list.
 # Can be called directly or when looping through
 # the event queue.
-async def emit_now(seed_event, event_list, value):
-    global handycon
+async def emit_now(handycon, seed_event, event_list, value):
 
     # Ignore malformed requests
     if not event_list:
@@ -736,7 +741,7 @@ async def emit_now(seed_event, event_list, value):
                 )
             case "Toggle Performance":
                 handycon.logger.debug("Toggle Performance")
-                await toggle_performance()
+                await toggle_performance(handycon)
             case "Hibernate", "Suspend", "Shutdown":
                 handycon.logger.error(
                     f"Power mode {event_list[0]} set to button action. "
@@ -772,18 +777,18 @@ async def emit_now(seed_event, event_list, value):
 
     size = len(events)
     if size > 1:
-        await emit_events(events)
+        await emit_events(handycon, events)
     elif size == 1:
-        emit_event(events[0])
+        emit_event(handycon, events[0])
 
 
-async def handle_key_down(seed_event, queued_event):
+async def handle_key_down(handycon, seed_event, queued_event):
     handycon.event_queue.append(queued_event)
     if queued_event in INSTANT_EVENTS:
         await handycon.emit_now(seed_event, queued_event, 1)
 
 
-async def handle_key_up(seed_event, queued_event):
+async def handle_key_up(handycon, seed_event, queued_event):
     if queued_event in INSTANT_EVENTS:
         handycon.event_queue.remove(queued_event)
         await handycon.emit_now(seed_event, queued_event, 0)
@@ -802,21 +807,20 @@ async def handle_key_up(seed_event, queued_event):
             handycon.last_button = None
 
 
-async def toggle_performance():
-    global handycon
+async def toggle_performance(handycon):
 
     if handycon.performance_mode == "--max-performance":
         handycon.performance_mode = "--power-saving"
-        await do_rumble(0, 100, 1000, 0)
+        await do_rumble(handycon, 0, 100, 1000, 0)
         await asyncio.sleep(FF_DELAY)
-        await do_rumble(0, 100, 1000, 0)
+        await do_rumble(handycon, 0, 100, 1000, 0)
     else:
         handycon.performance_mode = "--max-performance"
-        await do_rumble(0, 500, 1000, 0)
+        await do_rumble(handycon, 0, 500, 1000, 0)
         await asyncio.sleep(FF_DELAY)
-        await do_rumble(0, 75, 1000, 0)
+        await do_rumble(handycon, 0, 75, 1000, 0)
         await asyncio.sleep(FF_DELAY)
-        await do_rumble(0, 75, 1000, 0)
+        await do_rumble(handycon, 0, 75, 1000, 0)
 
     ryzenadj_command = f'ryzenadj {handycon.performance_mode}'
     run = os.popen(ryzenadj_command, 'r', 1).read().strip()
@@ -834,15 +838,14 @@ async def toggle_performance():
         handycon.logger.debug(f'Thermal mode set to {handycon.thermal_mode}.')
 
 
-def make_controller():
-    global handycon
+def make_controller(handycon):
 
     # Create the virtual controller.
     handycon.ui_device = UInput(
-            CONTROLLER_EVENTS,
-            name='Handheld Controller',
-            bustype=0x3,
-            vendor=0x045e,
-            product=0x028e,
-            version=0x110
-            )
+        CONTROLLER_EVENTS,
+        name='Handheld Controller',
+        bustype=0x3,
+        vendor=0x045e,
+        product=0x028e,
+        version=0x110
+    )

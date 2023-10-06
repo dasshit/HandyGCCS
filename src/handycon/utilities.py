@@ -19,7 +19,7 @@ from . import handycon as ally_gen1, handycon as anb_gen1, \
     handycon as gpd_gen1, handycon as gpd_gen2, handycon as gpd_gen3, \
     handycon as oxp_gen1, handycon as oxp_gen2, handycon as oxp_gen3, \
     handycon as oxp_gen4, handycon as oxp_gen6
-#import handycon.handhelds.oxp_gen5 as oxp_gen5
+# import handycon.handhelds.oxp_gen5 as oxp_gen5
 from .constants import \
     CHIMERA_LAUNCHER_PATH, \
     CONFIG_DIR, \
@@ -27,18 +27,17 @@ from .constants import \
     POWER_ACTION_MAP, \
     EVENT_MAP
 
-## Partial imports
+# Partial imports
 from time import sleep
 
-handycon = None
-def set_handycon(handheld_controller):
-    global handycon
+
+def set_handycon(handycon, handheld_controller):
     handycon = handheld_controller
 
 
-# Capture the username and home path of the user who has been logged in the longest.
-def get_user():
-    global handycon
+# Capture the username
+# and home path of the user who has been logged in the longest.
+def get_user(handycon):
 
     handycon.logger.debug("Identifying user.")
     cmd = "who | awk '{print $1}' | sort | head -1"
@@ -63,8 +62,7 @@ def get_user():
 
 
 # Identify the current device type. Kill script if not atible.
-def id_system():
-    global handycon
+def id_system(handycon):
 
     system_id = open("/sys/devices/virtual/dmi/id/product_name", "r").read().strip()
     cpu_vendor = get_cpu_vendor()
@@ -254,9 +252,7 @@ def id_system():
     )
 
 
-def get_cpu_vendor():
-    global handycon
-
+def get_cpu_vendor(handycon):
     cmd = "cat /proc/cpuinfo"
     all_info = subprocess.check_output(cmd, shell=True).decode().strip()
     for line in all_info.split("\n"):
@@ -264,8 +260,7 @@ def get_cpu_vendor():
                 return re.sub( ".*vendor_id.*:", "", line,1).strip()
 
 
-def get_config():
-    global handycon
+def get_config(handycon):
     # Check for an existing config file and load it.
     handycon.config = configparser.ConfigParser()
     if os.path.exists(CONFIG_PATH):
@@ -303,8 +298,7 @@ def map_config():
 
 
 # Sets the default configuration.
-def set_default_config():
-    global handycon
+def set_default_config(handycon):
     handycon.config["Button Map"] = {
             "button1": "SCR",
             "button2": "QAM",
@@ -323,8 +317,7 @@ def set_default_config():
 
 
 # Writes current config to disk.
-def write_config():
-    global handycon
+def write_config(handycon):
     # Make the HandyGCCS directory if it doesn't exist.
     if not os.path.exists(CONFIG_DIR):
         os.mkdir(CONFIG_DIR)
@@ -334,8 +327,7 @@ def write_config():
         handycon.logger.info(f"Created new config: {CONFIG_PATH}")
 
 
-def steam_ifrunning_deckui(cmd):
-    global handycon
+def steam_ifrunning_deckui(handycon, cmd):
 
     # Get the currently running Steam PID.
     steampid_path = handycon.HOME_PATH + '/.steam/steam.pid'
@@ -379,9 +371,7 @@ def steam_ifrunning_deckui(cmd):
         return False
 
 
-def launch_chimera():
-    global handycon
-
+def launch_chimera(handycon):
     if not handycon.HAS_CHIMERA_LAUNCHER:
         return
     subprocess.run([ "su", handycon.USER, "-c", CHIMERA_LAUNCHER_PATH ])

@@ -100,11 +100,11 @@ class HandheldController:
             exit()
         Path(HIDE_PATH).mkdir(parents=True, exist_ok=True)
         devices.restore_hidden()
-        utilities.get_user()
+        utilities.get_user(self)
         self.HAS_CHIMERA_LAUNCHER = os.path.isfile(CHIMERA_LAUNCHER_PATH)
-        utilities.id_system()
-        utilities.get_config()
-        devices.make_controller()
+        utilities.id_system(self)
+        utilities.get_config(self)
+        devices.make_controller(self)
 
         # Run asyncio loop to capture all events.
         self.loop = asyncio.get_event_loop()
@@ -229,4 +229,4 @@ class HandheldController:
 
 
 def main():
-    handycon = HandheldController()
+    HandheldController()

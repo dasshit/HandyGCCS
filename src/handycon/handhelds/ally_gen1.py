@@ -3,11 +3,7 @@
 # Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
 
 
-
-handycon = None
-
-def init_handheld(handheld_controller):
-    global handycon
+def init_handheld(handycon, handheld_controller):
     handycon = handheld_controller
     handycon.BUTTON_DELAY = 0.2
     handycon.CAPTURE_CONTROLLER = True
@@ -22,9 +18,7 @@ def init_handheld(handheld_controller):
 
 
 # Captures keyboard events and translates them to virtual device events.
-async def process_event(seed_event, active_keys):
-    global handycon
-
+async def process_event(handycon, seed_event, active_keys):
     # Button map shortcuts for easy reference.
     button1 = handycon.button_map["button1"]  # Default Screenshot
     button2 = handycon.button_map["button2"]  # Default QAM
