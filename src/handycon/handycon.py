@@ -70,7 +70,7 @@ class HandheldController:
                " %(filename)s:%(lineno)s:%(funcName)s |"
                " %(message)s",
         datefmt="%y%m%d_%H:%M:%S",
-        level=logging.DEBUG
+        level=logging.INFO
     )
     logger = logging.getLogger(__name__)
 
