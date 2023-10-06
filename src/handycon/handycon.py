@@ -126,7 +126,7 @@ class HandheldController:
         ):
             self.loop.add_signal_handler(
                 recv_signal,
-                lambda s: asyncio.create_task(self.exit())
+                lambda s=recv_signal: asyncio.create_task(self.exit())
             )
 
         exit_code = 0
