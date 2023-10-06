@@ -70,7 +70,7 @@ class HandheldController:
                " %(filename)s:%(lineno)s:%(funcName)s |"
                " %(message)s",
         datefmt="%y%m%d_%H:%M:%S",
-        level=logging.INFO
+        level=logging.DEBUG
     )
     logger = logging.getLogger(__name__)
 
@@ -175,11 +175,18 @@ class HandheldController:
             exit_code = 1
         except Exception as err:
             self.logger.error(f"{err} | Hit exception condition.")
-            self.logger.error(traceback.format_exc())
+            self.logger.exception(err)
             exit_code = 2
         finally:
             self.loop.stop()
             sys.exit(exit_code)
+
+    async def process_event(self, *args, **kwargs):
+        self.logger.warning(
+            'Function process_event is not defined yet! '
+            'Please ensure using devices mappings!'
+        )
+        self.logger.debug(f'args: {args}, kwargs; {kwargs}')
 
     # Match runtime variables to the config
     def map_config(self):
@@ -279,7 +286,7 @@ class HandheldController:
                 pid = f.read().strip()
         except Exception as err:
             self.logger.error(f"{err} | Error getting steam PID.")
-            self.logger.error(traceback.format_exc())
+            self.logger.exception(err)
             return False
 
         # Get the andline for the Steam process by checking /proc.
@@ -293,7 +300,7 @@ class HandheldController:
                 steam_cmd = f.read()
         except Exception as err:
             self.logger.error(f"{err} | Error getting steam cmdline.")
-            self.logger.error(traceback.format_exc())
+            self.logger.exception(err)
             return False
 
             # Use this andline to determine if Steam is running in DeckUI mode.
@@ -310,7 +317,7 @@ class HandheldController:
             return result.returncode == 0
         except Exception as err:
             self.logger.error(f"{err} | Error sending and to Steam.")
-            self.logger.error(traceback.format_exc())
+            self.logger.exception(err)
             return False
 
     # Capture the username
@@ -358,6 +365,7 @@ class HandheldController:
                 "AOKZOE A1 AR07",
         ):
             self.system_type = "AOK_GEN1"
+            __import__()
             aok_gen1.init_handheld(self)
 
         elif system_id in (
@@ -573,8 +581,8 @@ class HandheldController:
             task.cancel()
             try:
                 await task
-            except asyncio.CancelledError:
-                self.logger.error(traceback.format_exc())
+            except asyncio.CancelledError as err:
+                self.logger.exception(err)
         self.loop.stop()
         self.logger.info("Handheld Game Console Controller Service stopped.")
 
@@ -589,7 +597,7 @@ class HandheldController:
             self.logger.error(
                 "Error when scanning event devices. Restarting scan."
             )
-            self.logger.error(error)
+            self.logger.exception(error)
             time.sleep(DETECT_DELAY)
             return False
 
@@ -835,144 +843,10 @@ class HandheldController:
 
                         # Capture keyboard events
                         # and translate them to mapped events.
-                        match self.system_type:
-                            case "ALY_GEN1":
-                                await ally_gen1.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "ANB_GEN1":
-                                await anb_gen1.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "AOK_GEN1":
-                                await aok_gen1.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "AOK_GEN2":
-                                await aok_gen2.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "AYA_GEN1":
-                                await aya_gen1.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "AYA_GEN2":
-                                await aya_gen2.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "AYA_GEN3":
-                                await aya_gen3.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "AYA_GEN4":
-                                await aya_gen4.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "AYA_GEN5":
-                                await aya_gen5.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "AYA_GEN6":
-                                await aya_gen6.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "AYA_GEN7":
-                                await aya_gen7.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "AYN_GEN1":
-                                await ayn_gen1.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "AYN_GEN2":
-                                await ayn_gen2.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "AYN_GEN3":
-                                await ayn_gen3.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "GPD_GEN1":
-                                await gpd_gen1.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "GPD_GEN2":
-                                await gpd_gen2.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "GPD_GEN3":
-                                await gpd_gen3.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "OXP_GEN1":
-                                await oxp_gen1.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "OXP_GEN2":
-                                await oxp_gen2.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "OXP_GEN3":
-                                await oxp_gen3.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            case "OXP_GEN4":
-                                await oxp_gen4.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
-                            # case "OXP_GEN5":
-                            #    await oxp_gen5.process_event(
-                            #                                 seed_event,
-                            #                                 active_keys
-                            #                             )
-                            case "OXP_GEN6":
-                                await oxp_gen6.process_event(
-                                    self,
-                                    seed_event,
-                                    active_keys
-                                )
+                        await self.process_event(
+                            seed_event,
+                            active_keys
+                        )
 
                 except Exception as err:
                     self.logger.error(
@@ -980,7 +854,7 @@ class HandheldController:
                         f"Error reading events from "
                         f"{self.keyboard_device.name}"
                     )
-                    self.logger.error(traceback.format_exc())
+                    self.logger.exception(err)
                     remove_device(HIDE_PATH, self.keyboard_event)
                     self.keyboard_device = None
                     self.keyboard_event = None
@@ -1022,13 +896,10 @@ class HandheldController:
 
                         # Capture keyboard events
                         # and translate them to mapped events.
-                        match self.system_type:
-                            case "ALY_GEN1":
-                                await ally_gen1.process_event(
-                                    self,
-                                    seed_event_2,
-                                    active_keys_2
-                                )
+                        await self.process_event(
+                            seed_event_2,
+                            active_keys_2
+                        )
 
                 except Exception as err:
                     self.logger.error(
@@ -1036,7 +907,7 @@ class HandheldController:
                         f"Error reading events "
                         f"from {self.keyboard_2_device.name}"
                     )
-                    self.logger.error(traceback.format_exc())
+                    self.logger.exception(err)
                     remove_device(HIDE_PATH, self.keyboard_2_event)
                     self.keyboard_2_device = None
                     self.keyboard_2_event = None
@@ -1067,7 +938,7 @@ class HandheldController:
                         f"Error reading events from "
                         f"{self.controller_device.name}."
                     )
-                    self.logger.error(traceback.format_exc())
+                    self.logger.exception(err)
                     remove_device(HIDE_PATH, self.controller_event)
                     self.controller_device = None
                     self.controller_event = None
@@ -1097,7 +968,7 @@ class HandheldController:
                     self.logger.error(
                         f"{err} | Error reading events from power device."
                     )
-                    self.logger.error(traceback.format_exc())
+                    self.logger.exception(err)
                     self.power_device = None
 
             elif self.power_device_2 and not self.power_device:
@@ -1116,7 +987,7 @@ class HandheldController:
                     self.logger.error(
                         f"{err} | Error reading events from power device."
                     )
-                    self.logger.error(traceback.format_exc())
+                    self.logger.exception(err)
                     self.power_device_2 = None
 
             else:
@@ -1199,7 +1070,7 @@ class HandheldController:
                     self.logger.error(
                         f"{err} | Error uploading effect {effect.id}."
                     )
-                    self.logger.error(traceback.format_exc())
+                    self.logger.exception(err)
                     upload.retval = -1
 
                 self.ui_device.end_upload(upload)
@@ -1215,7 +1086,7 @@ class HandheldController:
                     self.logger.error(
                         f"{err} | Error erasing effect {erase.effect_id}."
                     )
-                    self.logger.error(traceback.format_exc())
+                    self.logger.exception(err)
                     erase.retval = -1
 
                 self.ui_device.end_erase(erase)
