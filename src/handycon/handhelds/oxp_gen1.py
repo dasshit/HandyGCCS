@@ -14,6 +14,7 @@ def init_handheld(handycon):
     handycon.GAMEPAD_NAME = 'OneXPlayer Gamepad'
     handycon.KEYBOARD_ADDRESS = 'isa0060/serio0/input0'
     handycon.KEYBOARD_NAME = 'AT Translated Set 2 keyboard'
+    setattr(handycon, 'process_event', process_event)
 
 
 async def process_event(handycon, seed_event, active_keys):

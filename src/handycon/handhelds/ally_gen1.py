@@ -14,6 +14,7 @@ def init_handheld(handycon):
     handycon.KEYBOARD_NAME = 'Asus Keyboard'
     handycon.KEYBOARD_2_ADDRESS = 'usb-0000:0a:00.3-3/input2'
     handycon.KEYBOARD_2_NAME = 'Asus Keyboard'
+    setattr(handycon, 'process_event', process_event)
 
 
 # Captures keyboard events and translates them to virtual device events.

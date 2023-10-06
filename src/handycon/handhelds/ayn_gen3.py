@@ -18,6 +18,7 @@ def init_handheld(handycon):
     handycon.GAMEPAD_NAME = 'Microsoft X-Box 360 pad'
     handycon.KEYBOARD_ADDRESS = 'isa0060/serio0/input0'
     handycon.KEYBOARD_NAME = 'AT Translated Set 2 keyboard'
+    setattr(handycon, 'process_event', process_event)
 
 
 # Captures keyboard events and translates them to virtual device events.

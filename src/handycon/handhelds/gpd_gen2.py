@@ -14,6 +14,7 @@ def init_handheld(handycon):
     handycon.GAMEPAD_NAME = 'Microsoft X-Box 360 pad'
     handycon.KEYBOARD_ADDRESS = 'usb-0000:74:00.3-4/input0'
     handycon.KEYBOARD_NAME = '  Mouse for Windows'
+    setattr(handycon, 'process_event', process_event)
 
 
 # Captures keyboard events and translates them to virtual device events.

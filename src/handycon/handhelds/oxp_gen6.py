@@ -15,6 +15,7 @@ def init_handheld(handycon):
     handycon.GAMEPAD_NAME = 'Microsoft X-Box 360 pad'
     handycon.KEYBOARD_ADDRESS = 'isa0060/serio0/input0'
     handycon.KEYBOARD_NAME = 'AT Translated Set 2 keyboard'
+    setattr(handycon, 'process_event', process_event)
     if os.path.exists('/sys/devices/platform/oxp-platform/tt_toggle'):
         command = 'echo 1 > /sys/devices/platform/oxp-platform/tt_toggle'
         os.popen(command, buffering=1).read().strip()
