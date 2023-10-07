@@ -1160,8 +1160,8 @@ class HandheldController:
         Captures power events and handles long or short press events.
         :return:
         """
-        self.logger.debug(f'self.power_device: {self.power_device}')
-        self.logger.debug(f'self.power_device_2: {self.power_device_2}')
+        self.logger.warning(f'self.power_device: {self.power_device}')
+        self.logger.warning(f'self.power_device_2: {self.power_device_2}')
         power_key = self.power_device_2 \
             if self.power_device is None else self.power_device_2
 
@@ -1502,6 +1502,7 @@ def main():
     :return:
     """
     logging.basicConfig(
+        format='[%(levelname)s] -  %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s',
         level=logging.DEBUG
     )
 
