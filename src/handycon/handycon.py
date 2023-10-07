@@ -100,23 +100,23 @@ class HandheldController:
 
     # Enviroment Variables
     HAS_CHIMERA_LAUNCHER: bool = False
-    USER: str = None
-    HOME_PATH: Path = None
+    USER: Optional[str] = None
+    HOME_PATH: Optional[Path] = None
 
     # UInput Devices
-    controller_device = None
-    keyboard_device = None
-    keyboard_2_device = None
-    power_device = None
-    power_device_2 = None
+    controller_device: Optional[InputDevice] = None
+    keyboard_device: Optional[InputDevice] = None
+    keyboard_2_device: Optional[InputDevice] = None
+    power_device: Optional[InputDevice] = None
+    power_device_2: Optional[InputDevice] = None
 
     # Paths
-    controller_event = None
-    controller_path = None
-    keyboard_event = None
-    keyboard_path = None
-    keyboard_2_event = None
-    keyboard_2_path = None
+    controller_event: Optional[str] = None
+    controller_path: Optional[str] = None
+    keyboard_event: Optional[str] = None
+    keyboard_path: Optional[str] = None
+    keyboard_2_event: Optional[str] = None
+    keyboard_2_path: Optional[str] = None
 
     # Performance settings
     performance_mode: str = "--power-saving"
@@ -311,24 +311,22 @@ class HandheldController:
         :param cmd:
         :return:
         """
-        steampid_path = self.HOME_PATH + '/.steam/steam.pid'
+        steampid_path = self.HOME_PATH / '.steam/steam.pid'
         try:
-            with open(steampid_path) as f:
-                pid = f.read().strip()
+            pid = steampid_path.read_text().strip()
         except Exception as err:
             self.logger.error(f"{err} | Error getting steam PID.")
             self.logger.exception(err)
             return False
 
         # Get the andline for the Steam process by checking /proc.
-        steam_cmd_path = f"/proc/{pid}/cmdline"
-        if not os.path.exists(steam_cmd_path):
+        steam_cmd_path = Path(f"/proc/{pid}/cmdline")
+        if not steam_cmd_path.exists():
             # Steam not running.
             return False
 
         try:
-            with open(steam_cmd_path, "rb") as f:
-                steam_cmd = f.read()
+            steam_cmd = steam_cmd_path.read_bytes()
         except Exception as err:
             self.logger.error(f"{err} | Error getting steam cmdline.")
             self.logger.exception(err)
@@ -340,7 +338,7 @@ class HandheldController:
         if not is_deckui:
             return False
 
-        steam_path = self.HOME_PATH + '/.steam/root/ubuntu12_32/steam'
+        steam_path = self.HOME_PATH / '.steam/root/ubuntu12_32/steam'
         try:
             result = subprocess.run([
                 "su", self.USER, "-c", f"{steam_path} -ifrunning {cmd}"
@@ -375,7 +373,7 @@ class HandheldController:
             time.sleep(1)
 
         self.logger.debug(f"USER: {self.USER}")
-        self.HOME_PATH = "/home/" + self.USER
+        self.HOME_PATH = Path("/home/") / self.USER
         self.logger.debug(f"HOME_PATH: {self.HOME_PATH}")
 
     # Identify the current device type. Kill script if not atible.
@@ -1504,7 +1502,10 @@ def main():
     :return:
     """
     logging.basicConfig(
-        format='[%(levelname)s] -  %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s',
+        format='[%(levelname)s] -  '
+               '%(name)s - '
+               '(%(filename)s).%(funcName)s(%(lineno)d) - '
+               '%(message)s',
         level=logging.DEBUG
     )
 

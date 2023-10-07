@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 def restore_device(
         event: InputEvent,
-        path: Path
+        path: str
 ):
     """
     Both devices threads will attempt this,
