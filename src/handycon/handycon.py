@@ -1502,10 +1502,6 @@ def main():
     :return:
     """
     logging.basicConfig(
-        format="%(asctime)s |"
-               " %(filename)s:%(lineno)s:%(funcName)s |"
-               " %(message)s",
-        datefmt="%y%m%d_%H:%M:%S",
         level=logging.DEBUG
     )
 
