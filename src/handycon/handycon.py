@@ -1161,7 +1161,7 @@ class HandheldController:
         :return:
         """
         power_key = self.power_device \
-            if self.power_device else self.power_device_2
+            if self.power_device is not None else self.power_device_2
 
         if power_key is None:
 
