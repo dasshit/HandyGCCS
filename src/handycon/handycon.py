@@ -1160,8 +1160,10 @@ class HandheldController:
         Captures power events and handles long or short press events.
         :return:
         """
-        power_key = self.power_device \
-            if self.power_device is not None else self.power_device_2
+        self.logger.debug(f'self.power_device: {self.power_device}')
+        self.logger.debug(f'self.power_device_2: {self.power_device_2}')
+        power_key = self.power_device_2 \
+            if self.power_device is None else self.power_device_2
 
         if power_key is None:
 
