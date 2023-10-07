@@ -6,12 +6,22 @@ This will create a virtual UInput device and pull data from the built-in
 controller and "keyboard". Right side buttons are keyboard buttons that
 send macros (i.e. CTRL/ALT/DEL). We capture those events and send button
 presses that Steam understands.
-
 """
-from evdev import ecodes as e
+from types import MethodType
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.handycon.handycon import HandheldController
+
+from evdev import ecodes as e, InputEvent
 
 
-def init_handheld(handycon):
+def init_handheld(handycon: HandheldController):
+    """
+    Captures keyboard events and translates them to virtual device events.
+    :param handycon:
+    :return:
+    """
+    handycon.process_event = MethodType(process_event, handycon)
     handycon.BUTTON_DELAY = 0.11
     handycon.CAPTURE_CONTROLLER = True
     handycon.CAPTURE_KEYBOARD = True
@@ -22,8 +32,18 @@ def init_handheld(handycon):
     handycon.KEYBOARD_NAME = 'AT Translated Set 2 keyboard'
 
 
-# Captures keyboard events and translates them to virtual device events.
-async def process_event(handycon, seed_event, active_keys):
+async def process_event(
+        handycon: HandheldController,
+        seed_event: InputEvent,
+        active_keys: list[int]
+):
+    """
+    Captures keyboard events and translates them to virtual device events.
+    :param handycon:
+    :param seed_event:
+    :param active_keys:
+    :return:
+    """
     # Button map shortcuts for easy reference.
     button1 = handycon.button_map["button1"]  # Default Screenshot
     button2 = handycon.button_map["button2"]  # Default QAM

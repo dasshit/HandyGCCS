@@ -197,6 +197,17 @@ class HandheldController:
             seed_event: InputEvent,
             active_keys: list[int]
     ):
+        """
+        Captures keyboard events and translates them to virtual device events.
+        :param seed_event:
+        :param active_keys:
+        :return:
+        """
+        logger.debug(
+            f'self: {self}, '
+            f'seed_event: {seed_event}, '
+            f'active_keys: {active_keys}'
+        )
         logger.warning('Method process_event not assigned right now!!!')
 
     def map_config(self):

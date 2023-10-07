@@ -3,12 +3,22 @@
 This file is part of Handheld Game Console Controller System (HandyGCCS)
 Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
 """
+from types import MethodType
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.handycon.handycon import HandheldController
 
 import os
-from evdev import ecodes as e
+from evdev import ecodes as e, InputEvent
 
 
-def init_handheld(handycon):
+def init_handheld(handycon: HandheldController):
+    """
+    Captures keyboard events and translates them to virtual device events.
+    :param handycon:
+    :return:
+    """
+    handycon.process_event = MethodType(process_event, handycon)
     handycon.BUTTON_DELAY = 0.09
     handycon.CAPTURE_CONTROLLER = True
     handycon.CAPTURE_KEYBOARD = True
@@ -22,8 +32,18 @@ def init_handheld(handycon):
         os.popen(command, buffering=1).read().strip()
 
 
-# Captures keyboard events and translates them to virtual device events.
-async def process_event(handycon, seed_event, active_keys):
+async def process_event(
+        handycon: HandheldController,
+        seed_event: InputEvent,
+        active_keys: list[int]
+):
+    """
+    Captures keyboard events and translates them to virtual device events.
+    :param handycon:
+    :param seed_event:
+    :param active_keys:
+    :return:
+    """
     # Button map shortcuts for easy reference.
     button1 = handycon.button_map["button1"]  # Default Screenshot
     button2 = handycon.button_map["button2"]  # Default QAM

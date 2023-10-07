@@ -4,12 +4,15 @@ This file is part of Handheld Game Console Controller System (HandyGCCS)
 Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
 """
 from types import MethodType
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.handycon.handycon import HandheldController
 
 # Partial imports
 from evdev import InputEvent
 
 
-def init_handheld(handycon):
+def init_handheld(handycon: HandheldController):
     """
     Captures keyboard events and translates them to virtual device events.
     :param handycon:
@@ -29,7 +32,7 @@ def init_handheld(handycon):
 
 
 async def process_event(
-        handycon,
+        handycon: HandheldController,
         seed_event: InputEvent,
         active_keys: list[int]
 ):
