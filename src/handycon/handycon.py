@@ -1299,8 +1299,8 @@ class HandheldController:
         for hidden_event in os.listdir(HIDE_PATH):
             logger.debug(f'Restoring {hidden_event}')
             shutil.move(
-                str(HIDE_PATH / hidden_event),
-                "/dev/input/" + hidden_event
+                HIDE_PATH / hidden_event,
+                Path("/dev/input/") / hidden_event
             )
 
     async def emit_events(self, events: list[InputEvent]):
