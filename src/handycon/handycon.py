@@ -100,8 +100,8 @@ class HandheldController:
 
     # Enviroment Variables
     HAS_CHIMERA_LAUNCHER: bool = False
-    USER = None
-    HOME_PATH = None
+    USER: str = os.getenv('USER')
+    HOME_PATH: Path = Path(os.getenv('HOME'))
 
     # UInput Devices
     controller_device = None
@@ -135,7 +135,6 @@ class HandheldController:
             exit()
         Path(HIDE_PATH).mkdir(parents=True, exist_ok=True)
         self.restore_hidden()
-        self.get_user()
         self.HAS_CHIMERA_LAUNCHER = os.path.isfile(CHIMERA_LAUNCHER_PATH)
         self.id_system()
         self.get_config()
@@ -311,7 +310,7 @@ class HandheldController:
         :param cmd:
         :return:
         """
-        steampid_path = self.HOME_PATH + '/.steam/steam.pid'
+        steampid_path = self.HOME_PATH / '.steam/steam.pid'
         try:
             with open(steampid_path) as f:
                 pid = f.read().strip()
@@ -340,7 +339,7 @@ class HandheldController:
         if not is_deckui:
             return False
 
-        steam_path = self.HOME_PATH + '/.steam/root/ubuntu12_32/steam'
+        steam_path = self.HOME_PATH / '.steam/root/ubuntu12_32/steam'
         try:
             result = subprocess.run([
                 "su", self.USER, "-c", f"{steam_path} -ifrunning {cmd}"
@@ -350,33 +349,6 @@ class HandheldController:
             self.logger.error(f"{err} | Error sending and to Steam.")
             self.logger.exception(err)
             return False
-
-    def get_user(self):
-        """
-        Capture the username
-        and home path of the user who has been logged in the longest.
-        :return:
-        """
-        self.logger.debug("Identifying user.")
-        cmd = "who | awk '{print $1}' | sort | head -1"
-        while self.USER is None:
-            USER_LIST = subprocess.Popen(
-                args=cmd,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                shell=True
-            )
-            for get_first in USER_LIST.stdout:
-                name = get_first.decode().strip()
-                if name is not None:
-                    self.USER = name
-                break
-            time.sleep(1)
-
-        self.logger.debug(f"USER: {self.USER}")
-        self.HOME_PATH = "/home/" + self.USER
-        self.logger.debug(f"HOME_PATH: {self.HOME_PATH}")
 
     # Identify the current device type. Kill script if not atible.
     def id_system(self):
@@ -1165,8 +1137,10 @@ class HandheldController:
         elif self.power_device_2 is not None:
             power_key = self.power_device_2
         else:
-            self.logger.warning('Power device is undefined, searching for it...')
-            self.logger.info("Attempting to grab controller device...")
+            self.logger.warning(
+                'Power device is undefined, searching for it...')
+            self.logger.warning(
+                "Attempting to grab controller device...")
             self.get_powerkey()
             await asyncio.sleep(DETECT_DELAY)
             return
