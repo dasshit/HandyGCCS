@@ -10,23 +10,29 @@ import asyncio
 import configparser
 import logging
 import os
-import pathlib
 import re
-import shutil
 import signal
 import subprocess
 import sys
 import time
 import warnings
+
+from pathlib import Path
 from typing import Literal, Union, Optional
 
 # Local modules
 from .constants import \
     CHIMERA_LAUNCHER_PATH, \
-    HIDE_PATH, POWER_ACTION_MAP, EVENT_MAP, CONFIG_PATH, CONFIG_DIR, \
-    DETECT_DELAY, INSTANT_EVENTS, QUEUED_EVENTS, FF_DELAY, CONTROLLER_EVENTS
-from . import devices
-from .devices import remove_device
+    HIDE_PATH, \
+    POWER_ACTION_MAP, \
+    EVENT_MAP, \
+    CONFIG_PATH, \
+    CONFIG_DIR, \
+    DETECT_DELAY, \
+    INSTANT_EVENTS, \
+    QUEUED_EVENTS, \
+    FF_DELAY, \
+    CONTROLLER_EVENTS
 from .handhelds import \
     ally_gen1, \
     anb_gen1, \
@@ -51,8 +57,6 @@ from .handhelds import \
     oxp_gen4, \
     oxp_gen6
 
-# Partial imports
-from pathlib import Path
 # Partial imports
 from evdev import \
     ecodes as e, \
@@ -82,8 +86,9 @@ class HandheldController:
     last_x_val: int = 0
     last_y_val: int = 0
     power_action: Literal["Hibernate", "Suspend", "Shutdown"] = "Suspend"
-    running: bool = False
+    running: bool = True
     shutdown: bool = False
+    system_type: str = "Generic handheld"
 
     # Handheld Config
     BUTTON_DELAY: Union[int, float] = 0.00
@@ -113,18 +118,17 @@ class HandheldController:
 
     # Paths
     controller_event: Optional[str] = None
-    controller_path: Optional[str] = None
+    controller_path: Optional[Path] = None
     keyboard_event: Optional[str] = None
-    keyboard_path: Optional[str] = None
+    keyboard_path: Optional[Path] = None
     keyboard_2_event: Optional[str] = None
-    keyboard_2_path: Optional[str] = None
+    keyboard_2_path: Optional[Path] = None
 
     # Performance settings
     performance_mode: str = "--power-saving"
     thermal_mode: str = "0"
 
     def __init__(self):
-        self.running = True
         logger.info(
             "Starting Handhend Game Console Controller Service..."
         )
@@ -134,7 +138,7 @@ class HandheldController:
                 "Input management not possible. Exiting."
             )
             exit()
-        Path(HIDE_PATH).mkdir(parents=True, exist_ok=True)
+        HIDE_PATH.mkdir(parents=True, exist_ok=True)
         self.restore_hidden()
         self.get_user()
         self.HAS_CHIMERA_LAUNCHER = os.path.isfile(CHIMERA_LAUNCHER_PATH)
@@ -148,7 +152,6 @@ class HandheldController:
             product=0x028e,
             version=0x110
         )
-        self.system_type = 'Generic System'
 
         # Run asyncio loop to capture all events.
         self.loop = asyncio.get_event_loop()
@@ -196,18 +199,8 @@ class HandheldController:
         :return:
         """
         self.button_map = {
-            "button1": EVENT_MAP[self.config["Button Map"]["button1"]],
-            "button2": EVENT_MAP[self.config["Button Map"]["button2"]],
-            "button3": EVENT_MAP[self.config["Button Map"]["button3"]],
-            "button4": EVENT_MAP[self.config["Button Map"]["button4"]],
-            "button5": EVENT_MAP[self.config["Button Map"]["button5"]],
-            "button6": EVENT_MAP[self.config["Button Map"]["button6"]],
-            "button7": EVENT_MAP[self.config["Button Map"]["button7"]],
-            "button8": EVENT_MAP[self.config["Button Map"]["button8"]],
-            "button9": EVENT_MAP[self.config["Button Map"]["button9"]],
-            "button10": EVENT_MAP[self.config["Button Map"]["button10"]],
-            "button11": EVENT_MAP[self.config["Button Map"]["button11"]],
-            "button12": EVENT_MAP[self.config["Button Map"]["button12"]],
+            key: EVENT_MAP[self.config['Button Map'][key]]
+            for key in self.config["Button Map"].keys()
         }
         self.power_action = POWER_ACTION_MAP[
             self.config["Button Map"]["power_button"]
@@ -242,10 +235,10 @@ class HandheldController:
         :return:
         """
         # Make the HandyGCCS directory if it doesn't exist.
-        if not os.path.exists(CONFIG_DIR):
-            os.mkdir(CONFIG_DIR)
+        if not CONFIG_DIR.exists():
+            CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
-        with open(CONFIG_PATH, 'w') as config_file:
+        with CONFIG_PATH.open(mode='w') as config_file:
             self.config.write(config_file)
             logger.info(f"Created new config: {CONFIG_PATH}")
 
@@ -255,19 +248,23 @@ class HandheldController:
         :return:
         """
         # Check for an existing config file and load it.
-        self.config: configparser.ConfigParser = configparser.ConfigParser()
-        if os.path.exists(CONFIG_PATH):
+        self.config = configparser.ConfigParser()
+
+        if CONFIG_PATH.exists():
             logger.info(f"Loading existing config: {CONFIG_PATH}")
             self.config.read(CONFIG_PATH)
+
             if "power_button" not in self.config["Button Map"]:
                 logger.info(
                     "Config file out of date. Generating new config."
                 )
                 self.set_default_config()
                 self.write_config()
+
         else:
             self.set_default_config()
             self.write_config()
+
         self.map_config()
 
     @staticmethod
@@ -282,14 +279,19 @@ class HandheldController:
             if "vendor_id" in line:
                 return re.sub(".*vendor_id.*:", "", line, 1).strip()
 
-    def launch_chimera(self):
+    def launch_chimera(self) -> bool:
         """
         Launching Chimera App
         :return:
         """
         if not self.HAS_CHIMERA_LAUNCHER:
-            return
-        subprocess.run(["su", self.USER, "-c", CHIMERA_LAUNCHER_PATH])
+            return False
+        try:
+            subprocess.run(["su", self.USER, "-c", CHIMERA_LAUNCHER_PATH])
+            return True
+        except Exception as error:
+            logger.exception(error)
+            return False
 
     @staticmethod
     def is_process_running(name: str) -> bool:
@@ -351,7 +353,7 @@ class HandheldController:
             logger.exception(err)
             return False
 
-    def get_user(self):
+    def get_user(self) -> bool:
         """
         Capture the username
         and home path of the user who has been logged in the longest.
@@ -377,14 +379,14 @@ class HandheldController:
         logger.debug(f"USER: {self.USER}")
         self.HOME_PATH = Path("/home/") / self.USER
         logger.debug(f"HOME_PATH: {self.HOME_PATH}")
+        return True
 
-    # Identify the current device type. Kill script if not atible.
     def id_system(self):
         """
         Identify system and set self attrs of controller and keyboards
         :return:
         """
-        system_id = pathlib.Path(
+        system_id = Path(
             "/sys/devices/virtual/dmi/id/product_name").read_text().strip()
         cpu_vendor = self.get_cpu_vendor()
         logger.debug(f"Found CPU Vendor: {cpu_vendor}")
@@ -572,7 +574,6 @@ class HandheldController:
             f"and configured defaults for {self.system_type}."
         )
 
-    # Gracefull shutdown.
     async def exit(self):
         """
         Method for graceful shutdown of handycon
@@ -581,24 +582,24 @@ class HandheldController:
         logger.info("Receved exit signal. Restoring devices.")
         self.running = False
 
-        if self.controller_device:
-            try:
-                self.controller_device.ungrab()
-            except IOError:
-                pass
-            devices.restore_device(self.controller_event, self.controller_path)
-        if self.keyboard_device:
-            try:
-                self.keyboard_device.ungrab()
-            except IOError:
-                pass
-            devices.restore_device(self.keyboard_event, self.keyboard_path)
-        if self.keyboard_2_device:
-            try:
-                self.keyboard_2_device.ungrab()
-            except IOError:
-                pass
-            devices.restore_device(self.keyboard_2_event, self.keyboard_2_path)
+        for device, event, path in [
+            (self.controller_device,
+             self.controller_event,
+             self.controller_path),
+            (self.keyboard_device,
+             self.keyboard_event,
+             self.keyboard_path),
+            (self.keyboard_2_device,
+             self.keyboard_2_event,
+             self.keyboard_2_path),
+        ]:
+            if device:
+                try:
+                    device.ungrab()
+                except IOError:
+                    pass
+                self.restore_device(event, path)
+
         if self.power_device and self.CAPTURE_POWER:
             try:
                 self.power_device.ungrab()
@@ -648,17 +649,15 @@ class HandheldController:
         for device in devices_original:
             if device.name == self.GAMEPAD_NAME \
                     and device.phys == self.GAMEPAD_ADDRESS:
-                self.controller_path = device.path
+                self.controller_path = Path(device.path)
                 self.controller_device = InputDevice(
                     self.controller_path
                 )
                 if self.CAPTURE_CONTROLLER:
                     self.controller_device.grab()
-                    self.controller_event = Path(
-                        self.controller_path).name
-                    shutil.move(
-                        self.controller_path,
-                        str(HIDE_PATH / self.controller_event)
+                    self.controller_event = self.controller_path.name
+                    self.controller_path.rename(
+                        HIDE_PATH / self.controller_event
                     )
                 break
 
@@ -700,14 +699,13 @@ class HandheldController:
             logger.debug(f"{device.name}, {device.phys}")
             if device.name == self.KEYBOARD_NAME \
                     and device.phys == self.KEYBOARD_ADDRESS:
-                self.keyboard_path = device.path
+                self.keyboard_path = Path(device.path)
                 self.keyboard_device = InputDevice(self.keyboard_path)
                 if self.CAPTURE_KEYBOARD:
                     self.keyboard_device.grab()
-                    self.keyboard_event = Path(self.keyboard_path).name
-                    shutil.move(
-                        self.keyboard_path,
-                        str(HIDE_PATH / self.keyboard_event)
+                    self.keyboard_event = self.keyboard_path.name
+                    self.keyboard_path.rename(
+                        HIDE_PATH / self.keyboard_event
                     )
                 break
 
@@ -748,15 +746,13 @@ class HandheldController:
             logger.debug(f"{device.name}, {device.phys}")
             if device.name == self.KEYBOARD_2_NAME \
                     and device.phys == self.KEYBOARD_2_ADDRESS:
-                self.keyboard_2_path = device.path
+                self.keyboard_2_path = Path(device.path)
                 self.keyboard_2_device = InputDevice(self.keyboard_2_path)
                 if self.CAPTURE_KEYBOARD:
                     self.keyboard_2_device.grab()
-                    self.keyboard_2_event = Path(
-                        self.keyboard_2_path).name
-                    shutil.move(
-                        self.keyboard_2_path,
-                        str(HIDE_PATH / self.keyboard_2_event)
+                    self.keyboard_2_event = self.keyboard_2_path.name
+                    self.keyboard_2_path.rename(
+                        HIDE_PATH / self.keyboard_2_event
                     )
                 break
 
@@ -1054,7 +1050,7 @@ class HandheldController:
                         f"{self.keyboard_device.name}"
                     )
                     logger.exception(err)
-                    remove_device(HIDE_PATH, self.keyboard_event)
+                    self.remove_device(HIDE_PATH, self.keyboard_event)
                     self.keyboard_device = None
                     self.keyboard_event = None
                     self.keyboard_path = None
@@ -1112,7 +1108,7 @@ class HandheldController:
                         f"from {self.keyboard_2_device.name}"
                     )
                     logger.exception(err)
-                    remove_device(HIDE_PATH, self.keyboard_2_event)
+                    self.remove_device(HIDE_PATH, self.keyboard_2_event)
                     self.keyboard_2_device = None
                     self.keyboard_2_event = None
                     self.keyboard_2_path = None
@@ -1146,7 +1142,7 @@ class HandheldController:
                         f"{self.controller_device.name}."
                     )
                     logger.exception(err)
-                    remove_device(HIDE_PATH, self.controller_event)
+                    self.remove_device(HIDE_PATH, self.controller_event)
                     self.controller_device = None
                     self.controller_event = None
                     self.controller_path = None
@@ -1160,20 +1156,22 @@ class HandheldController:
         Captures power events and handles long or short press events.
         :return:
         """
-        if self.power_device is not None:
-            power_key = self.power_device
-        elif self.power_device_2 is not None:
-            power_key = self.power_device_2
-        else:
-            logger.warning(
-                'Power device is undefined, searching for it...')
-            logger.warning(
-                "Attempting to grab controller device...")
-            self.get_powerkey()
-            await asyncio.sleep(DETECT_DELAY)
-            return
 
         while self.running:
+
+            if self.power_device is not None:
+                power_key = self.power_device
+            elif self.power_device_2 is not None:
+                power_key = self.power_device_2
+            else:
+                logger.warning(
+                    'Power device is undefined, searching for it...')
+                logger.warning(
+                    "Attempting to grab controller device...")
+                self.get_powerkey()
+                await asyncio.sleep(DETECT_DELAY)
+                continue
+
             try:
                 async for event in power_key.async_read_loop():
                     logger.debug(
@@ -1192,10 +1190,6 @@ class HandheldController:
                 logger.exception(err)
                 self.power_device = None
                 self.power_device_2 = None
-
-                logger.info("Attempting to grab controller device...")
-                self.get_powerkey()
-                await asyncio.sleep(DETECT_DELAY)
 
     def handle_power_action(self):
         """
@@ -1259,7 +1253,8 @@ class HandheldController:
                 try:
                     # Upload to the actual controller.
                     effect_id = self.controller_device.upload_effect(
-                        effect)
+                        effect
+                    )
                     effect.id = effect_id
 
                     ff_effect_id_set.add(effect_id)
@@ -1296,12 +1291,42 @@ class HandheldController:
         Deleting hidden events
         :return:
         """
-        for hidden_event in os.listdir(HIDE_PATH):
+        for hidden_event in HIDE_PATH.iterdir():
             logger.debug(f'Restoring {hidden_event}')
-            shutil.move(
-                HIDE_PATH / hidden_event,
+            hidden_event.rename(
                 Path("/dev/input/") / hidden_event
             )
+
+    @staticmethod
+    def restore_device(
+            event: str,
+            path: Path
+    ):
+        """
+        Both devices threads will attempt this,
+        so ignore if they have been moved.
+        :param event:
+        :param path:
+        :return:
+        """
+        hide_event_path = HIDE_PATH / event
+        if hide_event_path.exists():
+            hide_event_path.rename(path)
+
+    @staticmethod
+    def remove_device(
+            path: Path,
+            event: str
+    ):
+        """
+        Remove device
+        :param path:
+        :param event:
+        :return:
+        """
+        device_path = path / event
+        if device_path.exists():
+            device_path.unlink(missing_ok=True)
 
     async def emit_events(self, events: list[InputEvent]):
         """
@@ -1486,10 +1511,7 @@ class HandheldController:
         logger.debug(run)
 
         if self.system_type in ["ALY_GEN1"]:
-            if self.thermal_mode == "1":
-                self.thermal_mode = "0"
-            else:
-                self.thermal_mode = "1"
+            self.thermal_mode = "0" if self.thermal_mode == "1" else "1"
 
             command = f'echo {self.thermal_mode} > ' \
                       f'/sys/devices/' \

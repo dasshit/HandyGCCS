@@ -52,7 +52,7 @@ async def process_event(
     button11 = handycon.button_map["button11"]
     button12 = handycon.button_map["button12"]
 
-    ## Loop variables
+    # Loop variables
     button_on = seed_event.value
     this_button = None
 
