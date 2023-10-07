@@ -12,7 +12,7 @@ import os
 from evdev import ecodes as e, InputEvent
 
 
-def init_handheld(handycon: HandheldController):
+def init_handheld(handycon: "HandheldController"):
     """
     Captures keyboard events and translates them to virtual device events.
     :param handycon:
@@ -34,7 +34,7 @@ def init_handheld(handycon: HandheldController):
 
 
 async def process_event(
-        handycon: HandheldController,
+        handycon: "HandheldController",
         seed_event: InputEvent,
         active_keys: list[int]
 ):
