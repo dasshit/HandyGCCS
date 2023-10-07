@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-# HandyGCCS HandyCon
-# Copyright 2022 Derek J. Clark <derekjohn dot clark at gmail dot com>
-# This will create a virtual UInput device and pull data from the built-in
-# controller and "keyboard". Right side buttons are keyboard buttons that
-# send macros (i.e. CTRL/ALT/DEL). We capture those events and send button
-# presses that Steam understands.
+"""
+HandyGCCS HandyCon
+Copyright 2022 Derek J. Clark <derekjohn dot clark at gmail dot com>
+This will create a virtual UInput device and pull data from the built-in
+controller and "keyboard". Right side buttons are keyboard buttons that
+send macros (i.e. CTRL/ALT/DEL). We capture those events and send button
+presses that Steam understands.
+"""
 
 from evdev import ecodes as e
 
@@ -18,7 +20,6 @@ def init_handheld(handycon):
     handycon.GAMEPAD_NAME = 'Microsoft X-Box 360 pad'
     handycon.KEYBOARD_ADDRESS = 'isa0060/serio0/input0'
     handycon.KEYBOARD_NAME = 'AT Translated Set 2 keyboard'
-    setattr(handycon, 'process_event', process_event)
 
 
 # Captures keyboard events and translates them to virtual device events.

@@ -1,5 +1,5 @@
+#!/usr/bin/env python3
 """
-!/usr/bin/env python3
 This file is part of Handheld Game Console Controller System (HandyGCCS)
 Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
 """
@@ -15,7 +15,7 @@ import logging
 from evdev import InputEvent
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('handycon')
 
 
 def restore_device(

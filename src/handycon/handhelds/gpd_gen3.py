@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-# This file is part of Handheld Game Console Controller System (HandyGCCS)
-# Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
+"""
+This file is part of Handheld Game Console Controller System (HandyGCCS)
+Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
+"""
 
 from evdev import ecodes as e
 
@@ -14,7 +16,6 @@ def init_handheld(handycon):
     handycon.GAMEPAD_NAME = 'Microsoft X-Box 360 pad'
     handycon.KEYBOARD_ADDRESS = 'usb-0000:73:00.3-4.2/input1'
     handycon.KEYBOARD_NAME = '  Mouse for Windows'
-    setattr(handycon, 'process_event', process_event)
 
 async def process_event(handycon, seed_event, active_keys):
 

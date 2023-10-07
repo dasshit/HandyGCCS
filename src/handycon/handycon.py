@@ -1,5 +1,5 @@
+#!/usr/bin/env python3
 """
-!/usr/bin/env python3
 This file is part of Handheld Game Console Controller System (HandyGCCS)
 Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
 """
@@ -63,6 +63,9 @@ from evdev import \
     UInput
 
 
+logger = logging.getLogger('handycon')
+
+
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
@@ -70,8 +73,6 @@ class HandheldController:
     """
     Main class for catching controller/keyboard events
     """
-    logger = logging.getLogger(__name__)
-
     # Session Variables
     config: Optional[configparser.ConfigParser] = None
     button_map: dict[str, list[list[int]]] = {}

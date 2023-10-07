@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-# This file is part of Handheld Game Console Controller System (HandyGCCS)
-# Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
+"""
+This file is part of Handheld Game Console Controller System (HandyGCCS)
+Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
+"""
 
 from . import handycon
 

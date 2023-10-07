@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-# This file is part of Handheld Game Console Controller System (HandyGCCS)
-# Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
-
+"""
+This file is part of Handheld Game Console Controller System (HandyGCCS)
+Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
+"""
 
 # Partial imports
 from evdev import InputEvent
@@ -37,7 +38,6 @@ async def process_event(
     :param active_keys:
     :return:
     """
-    handycon.logger.debug('[ally_gen1][process_event]')
     # Button map shortcuts for easy reference.
     button1 = handycon.button_map["button1"]  # Default Screenshot
     button2 = handycon.button_map["button2"]  # Default QAM

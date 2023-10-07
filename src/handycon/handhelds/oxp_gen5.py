@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-# This file is part of Handheld Game Console Controller System (HandyGCCS)
-# Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
-## Placeholder for OXP 2/2 Pro devices. Not implemented.
+"""
+This file is part of Handheld Game Console Controller System (HandyGCCS)
+Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
+"""
 import os
 from evdev import ecodes as e
 
@@ -19,7 +20,6 @@ def init_handheld(handycon):
     if os.path.exists('/sys/devices/platform/oxp-platform/tt_toggle'):
         command = 'echo 1 > /sys/devices/platform/oxp-platform/tt_toggle'
         os.popen(command, buffering=1).read().strip()
-        handycon.logger.info('Turbo button takeover enabled')
 
 
 # Captures keyboard events and translates them to virtual device events.

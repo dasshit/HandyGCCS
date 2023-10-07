@@ -1,12 +1,13 @@
-"""
 #!/sbin/python3
-# This file is part of Handheld Game Console Controller System (HandyGCCS)
-# Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
+"""
+This file is part of Handheld Game Console Controller System (HandyGCCS)
+Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
 """
 from typing import Literal, Union
 
 from evdev import AbsInfo, ecodes as e
 from pathlib import Path
+
 
 CHIMERA_LAUNCHER_PATH = Path('/usr/share/chimera/bin/chimera-web-launcher')
 CONFIG_DIR = Path("/etc/handygccs/")

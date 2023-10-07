@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-# This file is part of Handheld Game Console Controller System (HandyGCCS)
-# Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
+"""
+This file is part of Handheld Game Console Controller System (HandyGCCS)
+Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
+"""
 
 from evdev import ecodes as e
 
@@ -14,7 +16,6 @@ def init_handheld(handycon):
     handycon.GAMEPAD_NAME = 'OneXPlayer Gamepad'
     handycon.KEYBOARD_ADDRESS = 'isa0060/serio0/input0'
     handycon.KEYBOARD_NAME = 'AT Translated Set 2 keyboard'
-    setattr(handycon, 'process_event', process_event)
 
 
 async def process_event(handycon, seed_event, active_keys):
