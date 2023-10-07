@@ -1163,6 +1163,12 @@ class HandheldController:
         power_key = self.power_device \
             if self.power_device else self.power_device_2
 
+        if power_key is None:
+
+            self.logger.info("Attempting to grab controller device...")
+            self.get_powerkey()
+            await asyncio.sleep(DETECT_DELAY)
+
         while self.running:
             try:
                 async for event in power_key.async_read_loop():
