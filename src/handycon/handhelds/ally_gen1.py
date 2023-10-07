@@ -3,6 +3,7 @@
 This file is part of Handheld Game Console Controller System (HandyGCCS)
 Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
 """
+from types import MethodType
 
 # Partial imports
 from evdev import InputEvent
@@ -14,6 +15,7 @@ def init_handheld(handycon):
     :param handycon:
     :return:
     """
+    handycon.process_event = MethodType(process_event, handycon)
     handycon.BUTTON_DELAY = 0.2
     handycon.CAPTURE_CONTROLLER = True
     handycon.CAPTURE_KEYBOARD = True

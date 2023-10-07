@@ -192,214 +192,13 @@ class HandheldController:
             self.loop.stop()
             sys.exit(exit_code)
 
-    def init_handheld(handycon):
-        """
-        Captures keyboard events and translates them to virtual device events.
-        :param handycon:
-        :return:
-        """
-        handycon.BUTTON_DELAY = 0.2
-        handycon.CAPTURE_CONTROLLER = True
-        handycon.CAPTURE_KEYBOARD = True
-        handycon.CAPTURE_POWER = True
-        handycon.GAMEPAD_ADDRESS = 'usb-0000:0a:00.3-2/input0'
-        handycon.GAMEPAD_NAME = 'Microsoft X-Box 360 pad'
-        handycon.KEYBOARD_ADDRESS = 'usb-0000:0a:00.3-3/input0'
-        handycon.KEYBOARD_NAME = 'Asus Keyboard'
-        handycon.KEYBOARD_2_ADDRESS = 'usb-0000:0a:00.3-3/input2'
-        handycon.KEYBOARD_2_NAME = 'Asus Keyboard'
-
     async def process_event(
-            handycon,
+            self,
             seed_event: InputEvent,
             active_keys: list[int]
     ):
-        """
-        Translate event to button press
-        :param handycon:
-        :param seed_event:
-        :param active_keys:
-        :return:
-        """
-        # Button map shortcuts for easy reference.
-        button1 = handycon.button_map["button1"]  # Default Screenshot
-        button2 = handycon.button_map["button2"]  # Default QAM
-        button3 = handycon.button_map["button3"]  # Default ESC
-        button4 = handycon.button_map["button4"]  # Default OSK
-        button5 = handycon.button_map["button5"]  # Default MODE
-        button6 = handycon.button_map["button6"]
-        button7 = handycon.button_map["button7"]
-        button8 = handycon.button_map["button8"]
-        button9 = handycon.button_map["button9"]
-        button10 = handycon.button_map["button10"]
-        button11 = handycon.button_map["button11"]
-        button12 = handycon.button_map["button12"]
+        logger.warning('Method process_event not assigned right now!!!')
 
-        # Loop variables
-        button_on = seed_event.value
-        this_button = None
-
-        # Handle missed keys.
-        if active_keys == [] and handycon.event_queue != []:
-            this_button = handycon.event_queue[0]
-
-        # BUTTON 1 (Default: Screenshot) Paddle + Y
-        if active_keys == [184] \
-                and button_on == 1 \
-                and button1 not in handycon.event_queue:
-            handycon.event_queue.append(button1)
-        elif active_keys == [] \
-                and seed_event.code in [184, 185] \
-                and button_on == 0 \
-                and button1 in handycon.event_queue:
-            this_button = button1
-
-        # BUTTON 2 (Default: QAM) Armory Crate Button Short Press
-        if active_keys == [148] \
-                and button_on == 1 \
-                and button2 not in handycon.event_queue:
-            handycon.event_queue.append(button2)
-        elif active_keys == [] \
-                and seed_event.code in [148] \
-                and button_on == 0 \
-                and button2 in handycon.event_queue:
-            this_button = button2
-
-        # BUTTON 3 (Default: ESC) Paddle + X Temp disabled, goes nuts.
-        # This event triggers from KEYBOARD_2.
-        if active_keys == [25, 125] \
-                and button_on == 1 \
-                and button3 not in handycon.event_queue:
-            handycon.event_queue.append(button3)
-        elif active_keys == [] \
-                and seed_event.code in [49, 125, 185] \
-                and button_on == 0 \
-                and button3 in handycon.event_queue:
-            this_button = button3
-
-        # BUTTON 4 (Default: OSK) Paddle + D-Pad UP
-        if active_keys == [88] \
-                and button_on == 1 \
-                and button4 not in handycon.event_queue:
-            handycon.event_queue.append(button4)
-        elif active_keys == [] \
-                and seed_event.code in [88, 185] \
-                and button_on == 0 \
-                and button4 in handycon.event_queue:
-            this_button = button4
-
-        # BUTTON 5 (Default: Mode) Control Center Short Press.
-        if active_keys == [186] \
-                and button_on == 1 \
-                and button5 not in handycon.event_queue:
-            handycon.event_queue.append(button5)
-        elif active_keys == [] \
-                and seed_event.code in [186] \
-                and button_on == 0 \
-                and button5 in handycon.event_queue:
-            this_button = button5
-
-        # BUTTON 6 (Default: Launch Chimera) Paddle + A
-        if active_keys == [68] \
-                and button_on == 1 \
-                and button6 not in handycon.event_queue:
-            handycon.event_queue.append(button6)
-        elif active_keys == [] \
-                and seed_event.code in [68, 185] \
-                and button_on == 0 \
-                and button6 in handycon.event_queue:
-            this_button = button6
-
-        # BUTTON 7 (Default: Toggle Performance) Armory Crate Button Long Press
-        # This button triggers immediate down/up
-        # after holding for ~1s an F17 and then
-        # released another down/up for F18 on release.
-        # We use the F18 "KEY_UP" for release.
-        if active_keys == [187] \
-                and button_on == 1 \
-                and button7 not in handycon.event_queue:
-            handycon.event_queue.append(button7)
-            await handycon.do_rumble(0, 150, 1000, 0)
-        elif active_keys == [] \
-                and seed_event.code in [188] \
-                and button_on == 0 \
-                and button7 in handycon.event_queue:
-            this_button = button7
-
-        # BUTTON 8 (Default: Mode) Control Center Long Press.
-        # This event triggers from KEYBOARD_2.
-        if active_keys == [29, 56, 111] \
-                and button_on == 1 \
-                and button8 not in handycon.event_queue:
-            handycon.event_queue.append(button8)
-            await handycon.do_rumble(0, 150, 1000, 0)
-        elif active_keys == [] \
-                and seed_event.code in [29, 56, 111] \
-                and button_on == 0 \
-                and button8 in handycon.event_queue:
-            this_button = button8
-
-        # BUTTON 9 (Default: Toggle Mouse) Paddle + D-Pad DOWN
-        # This event triggers from KEYBOARD_2.
-        if active_keys == [1, 29, 42] \
-                and button_on == 1 \
-                and button9 not in handycon.event_queue:
-            handycon.event_queue.append(button9)
-        elif active_keys == [] \
-                and seed_event.code in [1, 29, 42, 185] \
-                and button_on == 0 \
-                and button9 in handycon.event_queue:
-            this_button = button9
-
-        # BUTTON 10 (Default: ALT+TAB) Paddle + D-Pad LEFT
-        # This event triggers from KEYBOARD_2.
-        if active_keys == [32, 125] \
-                and button_on == 1 \
-                and button10 not in handycon.event_queue:
-            handycon.event_queue.append(button10)
-        elif active_keys == [] \
-                and seed_event.code in [32, 125, 185] \
-                and button_on == 0 \
-                and button10 in handycon.event_queue:
-            this_button = button10
-
-        # BUTTON 11 (Default: KILL) Paddle + D-Pad RIGHT
-        # This event triggers from KEYBOARD_2.
-        if active_keys == [15, 125] \
-                and button_on == 1 \
-                and button11 not in handycon.event_queue:
-            handycon.event_queue.append(button11)
-        elif active_keys == [] \
-                and seed_event.code in [15, 125, 185] \
-                and button_on == 0 \
-                and button11 in handycon.event_queue:
-            this_button = button11
-
-        # BUTTON 12 (Default: Toggle Gyro) Paddle + B
-        # This event triggers from KEYBOARD_2.
-        if active_keys == [49, 125] \
-                and button_on == 1 \
-                and button12 not in handycon.event_queue:
-            handycon.event_queue.append(button12)
-        elif active_keys == [] \
-                and seed_event.code in [25, 125, 185] \
-                and button_on == 0 \
-                and button12 in handycon.event_queue:
-            this_button = button12
-
-        # Create list of events to fire.
-        # Handle new button presses.
-        if this_button and not handycon.last_button:
-            handycon.event_queue.remove(this_button)
-            handycon.last_button = this_button
-            await handycon.emit_now(seed_event, this_button, 1)
-
-        # Clean up old button presses.
-        elif handycon.last_button and not this_button:
-            await handycon.emit_now(seed_event, handycon.last_button, 0)
-            handycon.last_button = None
-
-    # Match runtime variables to the config
     def map_config(self):
         """
         Assign config file values for buttons and power button
@@ -598,9 +397,184 @@ class HandheldController:
         cpu_vendor = self.get_cpu_vendor()
         logger.debug(f"Found CPU Vendor: {cpu_vendor}")
 
-        self.system_type = "ALY_GEN1"
-        self.init_handheld()
+        # ANBERNIC Devices
+        if system_id in (
+                "Win600",
+        ):
+            self.system_type = "ANB_GEN1"
+            anb_gen1.init_handheld(self)
 
+        # AOKZOE Devices
+        elif system_id in (
+                "AOKZOE A1 AR07",
+        ):
+            self.system_type = "AOK_GEN1"
+            aok_gen1.init_handheld(self)
+
+        elif system_id in (
+                "AOKZOE A1 Pro",
+        ):
+            self.system_type = "AOK_GEN2"
+            aok_gen2.init_handheld(self)
+
+        # ASUS Devices
+        elif system_id in (
+                "ROG Ally RC71L_RC71L",
+        ):
+            self.system_type = "ALY_GEN1"
+            ally_gen1.init_handheld(self)
+
+        # Aya Neo Devices
+        elif system_id in (
+                "AYA NEO FOUNDER",
+                "AYA NEO 2021",
+                "AYANEO 2021",
+                "AYANEO 2021 Pro",
+                "AYANEO 2021 Pro Retro Power",
+        ):
+            self.system_type = "AYA_GEN1"
+            aya_gen1.init_handheld(self)
+
+        elif system_id in (
+                "NEXT",
+                "NEXT Pro",
+                "NEXT Advance",
+                "AYANEO NEXT",
+                "AYANEO NEXT Pro",
+                "AYANEO NEXT Advance",
+        ):
+            self.system_type = "AYA_GEN2"
+            aya_gen2.init_handheld(self)
+
+        elif system_id in (
+                "AIR",
+                "AIR Pro",
+        ):
+            self.system_type = "AYA_GEN3"
+            aya_gen3.init_handheld(self)
+
+        elif system_id in (
+                "AYANEO 2",
+                "GEEK",
+        ):
+            self.system_type = "AYA_GEN4"
+            aya_gen4.init_handheld(self)
+
+        elif system_id in (
+                "AIR Plus",
+        ):
+            if cpu_vendor == "GenuineIntel":
+                self.system_type = "AYA_GEN7"
+                aya_gen7.init_handheld(self)
+            else:
+                self.system_type = "AYA_GEN5"
+                aya_gen5.init_handheld(self)
+
+        elif system_id in (
+                "AYANEO 2S",
+                "GEEK 1S",
+                "AIR 1S",
+        ):
+            self.system_type = "AYA_GEN6"
+            aya_gen6.init_handheld(self)
+
+        # Ayn Devices
+        elif system_id in (
+                "Loki Max",
+        ):
+            self.system_type = "AYN_GEN1"
+            ayn_gen1.init_handheld(self)
+
+        elif system_id in (
+                "Loki Zero",
+        ):
+            self.system_type = "AYN_GEN2"
+            ayn_gen2.init_handheld(self)
+
+        elif system_id in (
+                "Loki MiniPro",
+        ):
+            self.system_type = "AYN_GEN3"
+            ayn_gen3.init_handheld(self)
+
+        # GPD Devices.
+        # Have 2 buttons with 3 modes (left, right, both)
+        elif system_id in (
+                "G1618-03",  # Win3
+        ):
+            self.system_type = "GPD_GEN1"
+            gpd_gen1.init_handheld(self)
+
+        elif system_id in (
+                "G1619-04",  # WinMax2
+        ):
+            self.system_type = "GPD_GEN2"
+            gpd_gen2.init_handheld(self)
+
+        elif system_id in (
+                "G1618-04",  # Win4
+        ):
+            self.system_type = "GPD_GEN3"
+            gpd_gen3.init_handheld(self)
+
+        # ONEXPLAYER and AOKZOE devices.
+        # BIOS have inlete DMI data
+        # and most models report as "ONE XPLAYER" or "ONEXPLAYER".
+        elif system_id in (
+                "ONE XPLAYER",
+                "ONEXPLAYER",
+        ):
+
+            # GEN 1
+            if cpu_vendor == "GenuineIntel":
+                self.system_type = "OXP_GEN1"
+                oxp_gen1.init_handheld(self)
+
+            # GEN 2
+            else:
+                self.system_type = "OXP_GEN2"
+                oxp_gen2.init_handheld(self)
+
+        # GEN 3
+        elif system_id in (
+                "ONEXPLAYER mini A07",
+        ):
+            self.system_type = "OXP_GEN3"
+            oxp_gen3.init_handheld(self)
+
+        # GEN 4
+        elif system_id in (
+                "ONEXPLAYER Mini Pro",
+        ):
+            self.system_type = "OXP_GEN4"
+            oxp_gen4.init_handheld(self)
+
+        # GEN 5
+        # elif system_id in (
+        #     "ONEXPLAYER 2",
+        #     "ONEXPLAYER 2 Pro",
+        # ):
+        #    self.system_type = "OXP_GEN5"
+        #    oxp_gen5.init_handheld(self)
+
+        # GEN 6
+        elif system_id in (
+                "ONEXPLAYER F1",
+        ):
+            self.system_type = "OXP_GEN6"
+            oxp_gen6.init_handheld(self)
+
+        # Devices that aren't supported could cause issues, exit.
+        else:
+            logger.error(
+                f"{system_id} is not currently supported by this tool. "
+                f"Open an issue on Github "
+                f"at https://github.ShadowBlip/HandyGCCS if this is a bug. "
+                f"If possible, se run the capture-system.py "
+                f"utility found on the GitHub repository "
+                f"and upload the file with your issue."
+            )
+            sys.exit(0)
         logger.info(
             f"Identified host system as {system_id} "
             f"and configured defaults for {self.system_type}."
@@ -922,24 +896,12 @@ class HandheldController:
                             f"Seed Code: {seed_event.code}, "
                             f"Seed Type: {seed_event.type}."
                         )
-                        if active_keys:
-                            logger.debug(
-                                f"Active Keys: {active_keys}")
-                        else:
-                            logger.debug("No active keys")
-                        if self.event_queue:
-                            logger.debug(
-                                f"Queued events: {self.event_queue}"
-                            )
-                        else:
-                            logger.debug("No active events.")
+                        logger.debug(f"Active Keys: {active_keys}")
+                        logger.debug(f"Queued events: {self.event_queue}")
 
                         # Capture keyboard events
                         # and translate them to mapped events.
-                        await self.process_event(
-                            seed_event,
-                            active_keys
-                        )
+                        await self.process_event(seed_event, active_keys)
 
                 except Exception as err:
                     logger.error(
@@ -977,24 +939,14 @@ class HandheldController:
                             f"Seed Code: {seed_event_2.code}, "
                             f"Seed Type: {seed_event_2.type}."
                         )
-                        if active_keys_2:
-                            logger.debug(
-                                f"Active Keys: {active_keys_2}")
-                        else:
-                            logger.debug("No active keys")
-                        if self.event_queue:
-                            logger.debug(
-                                f"Queued events: {self.event_queue}"
-                            )
-                        else:
-                            logger.debug("No active events.")
+                        logger.debug(f"Active Keys: {active_keys_2}")
+                        logger.debug(f"Queued events: {self.event_queue}")
 
                         # Capture keyboard events
                         # and translate them to mapped events.
                         match self.system_type:
                             case "ALY_GEN1":
-                                await ally_gen1.process_event(
-                                    self,
+                                await self.process_event(
                                     seed_event_2,
                                     active_keys_2
                                 )
