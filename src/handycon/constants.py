@@ -261,6 +261,19 @@ EVENT_SCR: list[
 EVENT_TOGGLE_GYRO: list[str] = ["Toggle Gyro"]
 EVENT_TOGGLE_MOUSE: list[str] = ["Toggle Mouse Mode"]
 EVENT_TOGGLE_PERF: list[str] = ["Toggle Performance"]
+
+POWER_ACTION_HIBERNATE: list[str] = ["Hibernate"]
+POWER_ACTION_SHUTDOWN: list[str] = ["Shutdown"]
+POWER_ACTION_SUSPEND: list[str] = ["Suspend"]
+POWER_ACTION_MAP: dict[
+    Literal["HIBERNATE", "SHUTDOWN", "SUSPEND"],
+    list[str]
+] = {
+    "HIBERNATE": POWER_ACTION_HIBERNATE,
+    "SHUTDOWN":  POWER_ACTION_SHUTDOWN,
+    "SUSPEND":   POWER_ACTION_SUSPEND,
+}
+
 EVENT_MAP: dict[str, list[list[int]]] = {
     "ALT_TAB": EVENT_ALT_TAB,
     "ESC": EVENT_ESC,
@@ -273,17 +286,9 @@ EVENT_MAP: dict[str, list[list[int]]] = {
     "TOGGLE_GYRO": EVENT_TOGGLE_GYRO,
     "TOGGLE_MOUSE": EVENT_TOGGLE_MOUSE,
     "TOGGLE_PERFORMANCE": EVENT_TOGGLE_PERF,
-}
-POWER_ACTION_HIBERNATE: list[str] = ["Hibernate"]
-POWER_ACTION_SHUTDOWN: list[str] = ["Shutdown"]
-POWER_ACTION_SUSPEND: list[str] = ["Suspend"]
-POWER_ACTION_MAP: dict[
-    Literal["HIBERNATE", "SHUTDOWN", "SUSPEND"],
-    list[str]
-] = {
+    "SUSPEND": POWER_ACTION_SUSPEND,
     "HIBERNATE": POWER_ACTION_HIBERNATE,
-    "SHUTDOWN":  POWER_ACTION_SHUTDOWN,
-    "SUSPEND":   POWER_ACTION_SUSPEND,
+    "SHUTDOWN": POWER_ACTION_SHUTDOWN
 }
 INSTANT_EVENTS: list[list[list[int]]] = [
     EVENT_MODE,
