@@ -14,7 +14,6 @@ import signal
 import subprocess
 import sys
 import time
-import traceback
 import warnings
 
 # Local modules
@@ -261,14 +260,13 @@ class HandheldController:
             if "vendor_id" in line:
                 return re.sub(".*vendor_id.*:", "", line, 1).strip()
 
-
     def launch_chimera(self):
         if not self.HAS_CHIMERA_LAUNCHER:
             return
         subprocess.run(["su", self.USER, "-c", CHIMERA_LAUNCHER_PATH])
 
-
     def is_process_running(self, name) -> bool:
+        self.logger.debug(f'name: {type(name)}')
         read_proc = os.popen("ps -Af").read()
         proc_count = read_proc.count(name)
         if proc_count > 0:
@@ -278,7 +276,7 @@ class HandheldController:
         return False
 
     def steam_ifrunning_deckui(self, cmd):
-
+        self.logger.debug(f'cmd: {type(cmd)}')
         # Get the currently running Steam PID.
         steampid_path = self.HOME_PATH + '/.steam/steam.pid'
         try:
@@ -789,7 +787,10 @@ class HandheldController:
             return True
 
     async def do_rumble(self, button=0, interval=10, length=1000, delay=0):
-
+        self.logger.debug(f'button: {type(button)}')
+        self.logger.debug(f'interval: {type(interval)}')
+        self.logger.debug(f'length: {type(length)}')
+        self.logger.debug(f'delay: {type(delay)}')
         # Prevent look crash if controller_device was taken.
         if not self.controller_device:
             return
@@ -1229,10 +1230,7 @@ class HandheldController:
                 self.ui_device.end_erase(erase)
 
     def restore_hidden(self):
-        hidden_events = os.listdir(HIDE_PATH)
-        if len(hidden_events) == 0:
-            return
-        for hidden_event in hidden_events:
+        for hidden_event in os.listdir(HIDE_PATH):
             self.logger.debug(f'Restoring {hidden_event}')
             shutil.move(
                 str(HIDE_PATH / hidden_event),
@@ -1244,17 +1242,20 @@ class HandheldController:
     # only to pass realtime events.
     # Use emit_now and the device's event_queue.
     async def emit_events(self, events: list):
+        self.logger.debug(f'events: {type(events)}')
 
         for event in events:
+            self.logger.debug(type(event))
             self.emit_event(event)
             # Pause between multiple events,
             # but not after the last one in the list.
-            if event != events[len(events) - 1]:
+            if event != events[-1]:
                 await asyncio.sleep(self.BUTTON_DELAY)
 
     # Emit a single event. Skips some logic checks for optimization.
     def emit_event(self, event):
         self.logger.debug(f"Emitting event: {event}")
+        self.logger.debug(type(event))
         self.ui_device.write_event(event)
         self.ui_device.syn()
 
@@ -1262,7 +1263,9 @@ class HandheldController:
     # Can be called directly or when looping through
     # the event queue.
     async def emit_now(self, seed_event, event_list, value):
-
+        self.logger.debug(f'seed_event: {type(seed_event)}')
+        self.logger.debug(f'event_list: {type(event_list)}')
+        self.logger.debug(f'value: {type(value)}')
         # Ignore malformed requests
         if not event_list:
             self.logger.error(
@@ -1340,6 +1343,8 @@ class HandheldController:
             await self.emit_now(seed_event, queued_event, 1)
 
     async def handle_key_up(self, seed_event, queued_event):
+        self.logger.debug(f'seed_event: {type(seed_event)}')
+        self.logger.debug(f'queued_event: {type(queued_event)}')
         if queued_event in INSTANT_EVENTS:
             self.event_queue.remove(queued_event)
             await self.emit_now(seed_event, queued_event, 0)

@@ -7,8 +7,15 @@ import os
 import shutil
 from .constants import HIDE_PATH
 
+import logging
+
+
+logger = logging.getLogger(__name__)
+
 
 def restore_device(event, path):
+    logger.debug(f'event: {type(event)}')
+    logger.debug(f'path: {type(path)}')
     # Both devices threads will attempt this,
     # so ignore if they have been moved.
     try:
@@ -18,6 +25,8 @@ def restore_device(event, path):
 
 
 def remove_device(path, event):
+    logger.debug(f'path: {type(path)}')
+    logger.debug(f'event: {type(event)}')
     try:
         os.remove(str(path / event))
     except FileNotFoundError:

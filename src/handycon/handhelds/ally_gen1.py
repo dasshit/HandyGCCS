@@ -6,6 +6,8 @@
 def init_handheld(handycon):
     # Captures keyboard events and translates them to virtual device events.
 
+    handycon.logger.debug(f'handycon: {type(handycon)}')
+
     handycon.BUTTON_DELAY = 0.2
     handycon.CAPTURE_CONTROLLER = True
     handycon.CAPTURE_KEYBOARD = True
@@ -24,6 +26,11 @@ async def process_event(
         seed_event,
         active_keys
 ):
+
+    handycon.logger.debug(f'handycon: {type(handycon)}')
+    handycon.logger.debug(f'seed_event: {type(seed_event)}')
+    handycon.logger.debug(f'active_keys: {type(active_keys)}')
+
     handycon.logger.debug('[ally_gen1][process_event]')
     # Button map shortcuts for easy reference.
     button1 = handycon.button_map["button1"]  # Default Screenshot
