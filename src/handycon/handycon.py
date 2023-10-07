@@ -1160,13 +1160,12 @@ class HandheldController:
         Captures power events and handles long or short press events.
         :return:
         """
-        self.logger.warning(f'self.power_device: {self.power_device}')
-        self.logger.warning(f'self.power_device_2: {self.power_device_2}')
-        power_key = self.power_device_2 \
-            if self.power_device is None else self.power_device_2
-
-        if power_key is None:
-
+        if self.power_device is not None:
+            power_key = self.power_device
+        elif self.power_device_2 is not None:
+            power_key = self.power_device_2
+        else:
+            self.logger.warning('Power device is undefined, searching for it...')
             self.logger.info("Attempting to grab controller device...")
             self.get_powerkey()
             await asyncio.sleep(DETECT_DELAY)
