@@ -3,11 +3,16 @@
 # Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
 
 
-def init_handheld(handycon):
-    # Captures keyboard events and translates them to virtual device events.
+# Partial imports
+from evdev import InputEvent
 
-    handycon.logger.debug(f'handycon: {type(handycon)}')
 
+def init_handheld(handycon: 'HandheldController'):
+    """
+    Captures keyboard events and translates them to virtual device events.
+    :param handycon:
+    :return:
+    """
     handycon.BUTTON_DELAY = 0.2
     handycon.CAPTURE_CONTROLLER = True
     handycon.CAPTURE_KEYBOARD = True
@@ -18,19 +23,20 @@ def init_handheld(handycon):
     handycon.KEYBOARD_NAME = 'Asus Keyboard'
     handycon.KEYBOARD_2_ADDRESS = 'usb-0000:0a:00.3-3/input2'
     handycon.KEYBOARD_2_NAME = 'Asus Keyboard'
-    # setattr(handycon, 'process_event', process_event)
 
 
 async def process_event(
-        handycon,
-        seed_event,
-        active_keys
+        handycon: 'HandheldController',
+        seed_event: InputEvent,
+        active_keys: list[int]
 ):
-
-    handycon.logger.debug(f'handycon: {type(handycon)}')
-    handycon.logger.debug(f'seed_event: {type(seed_event)}')
-    handycon.logger.debug(f'active_keys: {type(active_keys)}')
-
+    """
+    Translate event to button press
+    :param handycon:
+    :param seed_event:
+    :param active_keys:
+    :return:
+    """
     handycon.logger.debug('[ally_gen1][process_event]')
     # Button map shortcuts for easy reference.
     button1 = handycon.button_map["button1"]  # Default Screenshot

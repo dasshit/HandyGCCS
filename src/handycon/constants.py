@@ -1,14 +1,25 @@
+"""
 #!/sbin/python3
 # This file is part of Handheld Game Console Controller System (HandyGCCS)
 # Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
+"""
+from typing import Literal, Union
 
 from evdev import AbsInfo, ecodes as e
 from pathlib import Path
 
 CHIMERA_LAUNCHER_PATH = Path('/usr/share/chimera/bin/chimera-web-launcher')
-CONFIG_DIR = "/etc/handygccs/"
-CONFIG_PATH = "/etc/handygccs/handygccs.conf"
-CONTROLLER_EVENTS = {
+CONFIG_DIR = Path("/etc/handygccs/")
+CONFIG_PATH = CONFIG_DIR / "handygccs.conf"
+CONTROLLER_EVENTS: dict[
+    int,
+    Union[
+        list[int],
+        list[
+            tuple[int, AbsInfo]
+        ]
+    ]
+] = {
     e.EV_KEY: [
         e.KEY_ESC,
         e.KEY_1,
@@ -193,65 +204,94 @@ CONTROLLER_EVENTS = {
         e.FF_GAIN,
     ],
 }
-DETECT_DELAY = 0.5
-EVENT_ALT_TAB = [
+DETECT_DELAY: float = 0.5
+EVENT_ALT_TAB: list[
+    list[int]
+] = [
     [e.EV_KEY, e.KEY_LEFTALT],
     [e.EV_KEY, e.KEY_TAB]
 ]
-EVENT_ESC = [
+EVENT_ESC: list[
+    list[int]
+] = [
     [e.EV_MSC, e.MSC_SCAN],
     [e.EV_KEY, e.KEY_ESC]
 ]
-EVENT_KILL = [
+EVENT_KILL: list[
+    list[int]
+] = [
     [e.EV_KEY, e.KEY_LEFTMETA],
     [e.EV_KEY, e.KEY_LEFTCTRL],
     [e.EV_KEY, e.KEY_ESC]
 ]
-EVENT_MODE = [[e.EV_KEY, e.BTN_MODE]]
-EVENT_OPEN_CHIM = ["Open Chimera"]
-EVENT_OSK = [
+EVENT_MODE: list[
+    list[int]
+] = [
+    [e.EV_KEY, e.BTN_MODE]
+]
+EVENT_OPEN_CHIM: list[str] = [
+    "Open Chimera"
+]
+EVENT_OSK: list[
+    list[int]
+] = [
     [e.EV_KEY, e.BTN_MODE],
     [e.EV_KEY, e.BTN_NORTH]
 ]
-EVENT_OSK_DE = [
+EVENT_OSK_DE: list[
+    list[int]
+] = [
     [e.EV_KEY, e.KEY_LEFTMETA],
     [e.EV_KEY, e.KEY_LEFTCTRL],
     [e.EV_KEY, e.KEY_O]
 ]
-EVENT_QAM = [[e.EV_KEY, e.BTN_MODE], [e.EV_KEY, e.BTN_SOUTH]]
-EVENT_SCR = [[e.EV_KEY, e.BTN_MODE], [e.EV_KEY, e.BTN_TR]]
-EVENT_TOGGLE_GYRO = ["Toggle Gyro"]
-EVENT_TOGGLE_MOUSE = ["Toggle Mouse Mode"]
-EVENT_TOGGLE_PERF = ["Toggle Performance"]
-EVENT_MAP = {
-        "ALT_TAB": EVENT_ALT_TAB,
-        "ESC": EVENT_ESC,
-        "KILL": EVENT_KILL,
-        "MODE": EVENT_MODE,
-        "OPEN_CHIMERA": EVENT_OPEN_CHIM,
-        "OSK": EVENT_OSK,
-        "QAM": EVENT_QAM,
-        "SCR": EVENT_SCR,
-        "TOGGLE_GYRO": EVENT_TOGGLE_GYRO,
-        "TOGGLE_MOUSE": EVENT_TOGGLE_MOUSE,
-        "TOGGLE_PERFORMANCE": EVENT_TOGGLE_PERF,
-    }
-POWER_ACTION_HIBERNATE = ["Hibernate"]
-POWER_ACTION_SHUTDOWN = ["Shutdown"]
-POWER_ACTION_SUSPEND = ["Suspend"]
-POWER_ACTION_MAP = {
-        "HIBERNATE": POWER_ACTION_HIBERNATE,
-        "SHUTDOWN":  POWER_ACTION_SHUTDOWN,
-        "SUSPEND":   POWER_ACTION_SUSPEND,
-    }
-INSTANT_EVENTS = [
+EVENT_QAM: list[
+    list[int]
+] = [
+    [e.EV_KEY, e.BTN_MODE],
+    [e.EV_KEY, e.BTN_SOUTH]
+]
+EVENT_SCR: list[
+    list[int]
+] = [
+    [e.EV_KEY, e.BTN_MODE],
+    [e.EV_KEY, e.BTN_TR]
+]
+EVENT_TOGGLE_GYRO: list[str] = ["Toggle Gyro"]
+EVENT_TOGGLE_MOUSE: list[str] = ["Toggle Mouse Mode"]
+EVENT_TOGGLE_PERF: list[str] = ["Toggle Performance"]
+EVENT_MAP: dict[str, list[list[int]]] = {
+    "ALT_TAB": EVENT_ALT_TAB,
+    "ESC": EVENT_ESC,
+    "KILL": EVENT_KILL,
+    "MODE": EVENT_MODE,
+    "OPEN_CHIMERA": EVENT_OPEN_CHIM,
+    "OSK": EVENT_OSK,
+    "QAM": EVENT_QAM,
+    "SCR": EVENT_SCR,
+    "TOGGLE_GYRO": EVENT_TOGGLE_GYRO,
+    "TOGGLE_MOUSE": EVENT_TOGGLE_MOUSE,
+    "TOGGLE_PERFORMANCE": EVENT_TOGGLE_PERF,
+}
+POWER_ACTION_HIBERNATE: list[str] = ["Hibernate"]
+POWER_ACTION_SHUTDOWN: list[str] = ["Shutdown"]
+POWER_ACTION_SUSPEND: list[str] = ["Suspend"]
+POWER_ACTION_MAP: dict[
+    Literal["HIBERNATE", "SHUTDOWN", "SUSPEND"],
+    list[str]
+] = {
+    "HIBERNATE": POWER_ACTION_HIBERNATE,
+    "SHUTDOWN":  POWER_ACTION_SHUTDOWN,
+    "SUSPEND":   POWER_ACTION_SUSPEND,
+}
+INSTANT_EVENTS: list[list[list[int]]] = [
     EVENT_MODE,
     EVENT_OPEN_CHIM,
     EVENT_TOGGLE_GYRO,
     EVENT_TOGGLE_MOUSE,
     EVENT_TOGGLE_PERF
 ]
-QUEUED_EVENTS = [
+QUEUED_EVENTS: list[list[list[int]]] = [
     EVENT_ALT_TAB,
     EVENT_ESC,
     EVENT_KILL,
@@ -260,8 +300,8 @@ QUEUED_EVENTS = [
     EVENT_QAM,
     EVENT_SCR
 ]
-FF_DELAY = 0.2
-HIDE_PATH = Path("/dev/input/.hidden/")
-HOME_PATH = Path('/home')
-JOY_MAX = 32767
-JOY_MIN = -32767
+FF_DELAY: float = 0.2
+HIDE_PATH: Path = Path("/dev/input/.hidden/")
+HOME_PATH: Path = Path('/home')
+JOY_MAX: int = 32767
+JOY_MIN: int = -32767

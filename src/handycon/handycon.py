@@ -1,6 +1,9 @@
-#!/usr/bin/env python3
-# This file is part of Handheld Game Console Controller System (HandyGCCS)
-# Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
+"""
+!/usr/bin/env python3
+This file is part of Handheld Game Console Controller System (HandyGCCS)
+Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
+"""
+
 
 # Python Modules
 import asyncio
@@ -15,6 +18,7 @@ import subprocess
 import sys
 import time
 import warnings
+from typing import Literal, Union, Optional
 
 # Local modules
 from .constants import \
@@ -63,43 +67,39 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 class HandheldController:
-    # Logging
-    logging.basicConfig(
-        format="%(asctime)s |"
-               " %(filename)s:%(lineno)s:%(funcName)s |"
-               " %(message)s",
-        datefmt="%y%m%d_%H:%M:%S",
-        level=logging.DEBUG
-    )
+    """
+    Main class for catching controller/keyboard events
+    """
     logger = logging.getLogger(__name__)
 
     # Session Variables
-    config = None
-    button_map = {}
-    event_queue = []  # Stores inng button presses to block spam
-    last_button = None
-    last_x_val = 0
-    last_y_val = 0
-    power_action = "Suspend"
-    running = False
-    shutdown = False
+    config: Optional[configparser.ConfigParser] = None
+    button_map: dict[str, list[list[int]]] = {}
+    # Stores inng button presses to block spam
+    event_queue: list[InputEvent] = []
+    last_button: Optional[list[int]] = None
+    last_x_val: int = 0
+    last_y_val: int = 0
+    power_action: Literal["Hibernate", "Suspend", "Shutdown"] = "Suspend"
+    running: bool = False
+    shutdown: bool = False
 
     # Handheld Config
-    BUTTON_DELAY = 0.00
-    CAPTURE_CONTROLLER = False
-    CAPTURE_KEYBOARD = False
-    CAPTURE_POWER = False
-    GAMEPAD_ADDRESS = ''
-    GAMEPAD_NAME = ''
-    KEYBOARD_ADDRESS = ''
-    KEYBOARD_NAME = ''
-    KEYBOARD_2_ADDRESS = ''
-    KEYBOARD_2_NAME = ''
-    POWER_BUTTON_PRIMARY = "LNXPWRBN/button/input0"
-    POWER_BUTTON_SECONDARY = "PNP0C0C/button/input0"
+    BUTTON_DELAY: Union[int, float] = 0.00
+    CAPTURE_CONTROLLER: bool = False
+    CAPTURE_KEYBOARD: bool = False
+    CAPTURE_POWER: bool = False
+    GAMEPAD_ADDRESS: str = ''
+    GAMEPAD_NAME: str = ''
+    KEYBOARD_ADDRESS: str = ''
+    KEYBOARD_NAME: str = ''
+    KEYBOARD_2_ADDRESS: str = ''
+    KEYBOARD_2_NAME: str = ''
+    POWER_BUTTON_PRIMARY: str = "LNXPWRBN/button/input0"
+    POWER_BUTTON_SECONDARY: str = "PNP0C0C/button/input0"
 
     # Enviroment Variables
-    HAS_CHIMERA_LAUNCHER = False
+    HAS_CHIMERA_LAUNCHER: bool = False
     USER = None
     HOME_PATH = None
 
@@ -119,8 +119,8 @@ class HandheldController:
     keyboard_2_path = None
 
     # Performance settings
-    performance_mode = "--power-saving"
-    thermal_mode = "0"
+    performance_mode: str = "--power-saving"
+    thermal_mode: str = "0"
 
     def __init__(self):
         self.running = True
@@ -139,7 +139,15 @@ class HandheldController:
         self.HAS_CHIMERA_LAUNCHER = os.path.isfile(CHIMERA_LAUNCHER_PATH)
         self.id_system()
         self.get_config()
-        self.make_controller()
+        self.ui_device = UInput(
+            CONTROLLER_EVENTS,
+            name='Handheld Controller',
+            bustype=0x3,
+            vendor=0x045e,
+            product=0x028e,
+            version=0x110
+        )
+        self.system_type = 'Generic System'
 
         # Run asyncio loop to capture all events.
         self.loop = asyncio.get_event_loop()
@@ -180,16 +188,12 @@ class HandheldController:
             self.loop.stop()
             sys.exit(exit_code)
 
-    async def process_event(self, *args, **kwargs):
-        self.logger.warning(
-            'Function process_event is not defined yet! '
-            'Please ensure using devices mappings!'
-        )
-        self.logger.debug(f'args: {args}, kwargs; {kwargs}')
-
     # Match runtime variables to the config
     def map_config(self):
-        # Assign config file values
+        """
+        Assign config file values for buttons and power button
+        :return:
+        """
         self.button_map = {
             "button1": EVENT_MAP[self.config["Button Map"]["button1"]],
             "button2": EVENT_MAP[self.config["Button Map"]["button2"]],
@@ -205,10 +209,15 @@ class HandheldController:
             "button12": EVENT_MAP[self.config["Button Map"]["button12"]],
         }
         self.power_action = POWER_ACTION_MAP[
-            self.config["Button Map"]["power_button"]][0]
+            self.config["Button Map"]["power_button"]
+        ][0]
 
     # Sets the default configuration.
     def set_default_config(self):
+        """
+        Setting default handygccs.conf
+        :return:
+        """
         self.config["Button Map"] = {
             "button1": "SCR",
             "button2": "QAM",
@@ -227,6 +236,10 @@ class HandheldController:
 
     # Writes current config to disk.
     def write_config(self):
+        """
+        Creating /etc/handygccs folder and writing config
+        :return:
+        """
         # Make the HandyGCCS directory if it doesn't exist.
         if not os.path.exists(CONFIG_DIR):
             os.mkdir(CONFIG_DIR)
@@ -236,8 +249,12 @@ class HandheldController:
             self.logger.info(f"Created new config: {CONFIG_PATH}")
 
     def get_config(self):
+        """
+        Getting config from /etc/handygccs/handygccs.conf
+        :return:
+        """
         # Check for an existing config file and load it.
-        self.config = configparser.ConfigParser()
+        self.config: configparser.ConfigParser = configparser.ConfigParser()
         if os.path.exists(CONFIG_PATH):
             self.logger.info(f"Loading existing config: {CONFIG_PATH}")
             self.config.read(CONFIG_PATH)
@@ -254,30 +271,46 @@ class HandheldController:
 
     @staticmethod
     def get_cpu_vendor():
-        cmd = "cat /proc/cpuinfo"
+        """
+        Getting cpu vendor
+        :return:
+        """
+        cmd = "cat /proc/cpuinfo | egrep 'vendor_id'"
         all_info = subprocess.check_output(cmd, shell=True).decode().strip()
         for line in all_info.split("\n"):
             if "vendor_id" in line:
                 return re.sub(".*vendor_id.*:", "", line, 1).strip()
 
     def launch_chimera(self):
+        """
+        Launching Chimera App
+        :return:
+        """
         if not self.HAS_CHIMERA_LAUNCHER:
             return
         subprocess.run(["su", self.USER, "-c", CHIMERA_LAUNCHER_PATH])
 
-    def is_process_running(self, name) -> bool:
-        self.logger.debug(f'name: {type(name)}')
-        read_proc = os.popen("ps -Af").read()
-        proc_count = read_proc.count(name)
+    def is_process_running(self, name: str) -> bool:
+        """
+        Checking if process with name running
+        :param name: Process name
+        :return:
+        """
+        cmd = f"ps -Af | egrep '{name}' | egrep 'grep' -v | wc -l"
+        read_proc = os.popen(cmd).read()
+        proc_count = int(read_proc)
         if proc_count > 0:
             self.logger.debug(f'Process {name} is running.')
             return True
         self.logger.debug(f'Process {name} is NOT running.')
         return False
 
-    def steam_ifrunning_deckui(self, cmd):
-        self.logger.debug(f'cmd: {type(cmd)}')
-        # Get the currently running Steam PID.
+    def steam_ifrunning_deckui(self, cmd: str) -> bool:
+        """
+        Get the currently running Steam PID.
+        :param cmd:
+        :return:
+        """
         steampid_path = self.HOME_PATH + '/.steam/steam.pid'
         try:
             with open(steampid_path) as f:
@@ -318,10 +351,12 @@ class HandheldController:
             self.logger.exception(err)
             return False
 
-    # Capture the username
-    # and home path of the user who has been logged in the longest.
     def get_user(self):
-
+        """
+        Capture the username
+        and home path of the user who has been logged in the longest.
+        :return:
+        """
         self.logger.debug("Identifying user.")
         cmd = "who | awk '{print $1}' | sort | head -1"
         while self.USER is None:
@@ -345,7 +380,10 @@ class HandheldController:
 
     # Identify the current device type. Kill script if not atible.
     def id_system(self):
-
+        """
+        Identify system and set self attrs of controller and keyboards
+        :return:
+        """
         system_id = pathlib.Path(
             "/sys/devices/virtual/dmi/id/product_name").read_text().strip()
         cpu_vendor = self.get_cpu_vendor()
@@ -363,7 +401,6 @@ class HandheldController:
                 "AOKZOE A1 AR07",
         ):
             self.system_type = "AOK_GEN1"
-            __import__()
             aok_gen1.init_handheld(self)
 
         elif system_id in (
@@ -537,6 +574,10 @@ class HandheldController:
 
     # Gracefull shutdown.
     async def exit(self):
+        """
+        Method for graceful shutdown of handycon
+        :return:
+        """
         self.logger.info("Receved exit signal. Restoring devices.")
         self.running = False
 
@@ -584,13 +625,15 @@ class HandheldController:
         self.loop.stop()
         self.logger.info("Handheld Game Console Controller Service stopped.")
 
-    def get_controller(self):
-
+    def get_controller(self) -> bool:
+        """
+        Getting controller device
+        :return:
+        """
         # Identify system input event devices.
         self.logger.debug(f"Attempting to grab {self.GAMEPAD_NAME}.")
         try:
             devices_original = [InputDevice(path) for path in list_devices()]
-
         except Exception as error:
             self.logger.error(
                 "Error when scanning event devices. Restarting scan."
@@ -634,8 +677,11 @@ class HandheldController:
             )
             return True
 
-    def get_keyboard(self):
-
+    def get_keyboard(self) -> bool:
+        """
+        Getting keyboard
+        :return:
+        """
         # Identify system input event devices.
         self.logger.debug(f"Attempting to grab {self.KEYBOARD_NAME}.")
         try:
@@ -678,8 +724,11 @@ class HandheldController:
             )
             return True
 
-    def get_keyboard_2(self):
-
+    def get_keyboard_2(self) -> bool:
+        """
+        Getting keyboard
+        :return:
+        """
         self.logger.debug(
             f"Attempting to grab {self.KEYBOARD_2_NAME}.")
         try:
@@ -725,9 +774,11 @@ class HandheldController:
             )
             return True
 
-
     def get_powerkey(self):
-
+        """
+        Getting power button
+        :return:
+        """
         self.logger.debug("Attempting to grab power buttons.")
         # Identify system input event devices.
         try:
@@ -745,11 +796,13 @@ class HandheldController:
         # Grab the built-in devices.
         # This will give us exclusive
         # acces to the devices and their capabilities.
-        for device in devices_original:
+        for device in filter(
+                lambda x: x.name == 'Power Button',
+                devices_original
+        ):
 
             # Power Button
-            if device.name == 'Power Button' \
-                    and device.phys == self.POWER_BUTTON_PRIMARY \
+            if device.phys == self.POWER_BUTTON_PRIMARY \
                     and not self.power_device:
                 self.power_device = device
                 self.logger.debug(
@@ -761,8 +814,7 @@ class HandheldController:
             # Some devices have an extra power
             # input device corresponding to the same
             # physical button that needs to be grabbed.
-            if device.name == 'Power Button' \
-                    and device.phys == self.POWER_BUTTON_SECONDARY \
+            if device.phys == self.POWER_BUTTON_SECONDARY \
                     and not self.power_device_2:
                 self.power_device_2 = device
                 self.logger.debug(
@@ -786,11 +838,21 @@ class HandheldController:
                 )
             return True
 
-    async def do_rumble(self, button=0, interval=10, length=1000, delay=0):
-        self.logger.debug(f'button: {type(button)}')
-        self.logger.debug(f'interval: {type(interval)}')
-        self.logger.debug(f'length: {type(length)}')
-        self.logger.debug(f'delay: {type(delay)}')
+    async def do_rumble(
+            self,
+            button: int = 0,
+            interval: int = 10,
+            length: int = 1000,
+            delay: int = 0
+    ):
+        """
+        Process gamepad rumble
+        :param button:
+        :param interval:
+        :param length:
+        :param delay:
+        :return:
+        """
         # Prevent look crash if controller_device was taken.
         if not self.controller_device:
             return
@@ -814,8 +876,10 @@ class HandheldController:
 
     # Captures keyboard events and translates them to virtual device events.
     async def capture_keyboard_events(self):
-
-        # Capture keyboard events and translate them to mapped events.
+        """
+        Capture keyboard events and translate them to mapped events.
+        :return:
+        """
         while self.running:
             if self.keyboard_device:
                 try:
@@ -1001,8 +1065,10 @@ class HandheldController:
 
     # Captures keyboard events and translates them to virtual device events.
     async def capture_keyboard_2_events(self):
-
-        # Capture keyboard events and translate them to mapped events.
+        """
+        Capture keyboard events and translate them to mapped events.
+        :return:
+        """
         while self.running:
             if self.keyboard_2_device:
                 try:
@@ -1056,7 +1122,10 @@ class HandheldController:
                 await asyncio.sleep(DETECT_DELAY)
 
     async def capture_controller_events(self):
-
+        """
+        Capture keyboard events and translate them to mapped events.
+        :return:
+        """
         self.logger.debug(f"capture_controller_events, {self.running}")
         while self.running:
             if self.controller_device:
@@ -1086,80 +1155,59 @@ class HandheldController:
                 self.get_controller()
                 await asyncio.sleep(DETECT_DELAY)
 
-    # Captures power events and handles long or short press events.
     async def capture_power_events(self):
+        """
+        Captures power events and handles long or short press events.
+        :return:
+        """
+        power_key = self.power_device \
+            if self.power_device else self.power_device_2
 
         while self.running:
-            if self.power_device:
-                try:
-                    async for event in self.power_device.async_read_loop():
-                        self.logger.debug(
-                            f"Got event: "
-                            f"{event.type} | {event.code} | {event.value}"
-                        )
-                        if event.type == e.EV_KEY and event.code == 116:
-                            # KEY_POWER
-                            if event.value == 0:
-                                self.handle_power_action()
-
-                except Exception as err:
-                    self.logger.error(
-                        f"{err} | Error reading events from power device."
+            try:
+                async for event in power_key.async_read_loop():
+                    self.logger.debug(
+                        f"Got event: "
+                        f"{event.type} | {event.code} | {event.value}"
                     )
-                    self.logger.exception(err)
-                    self.power_device = None
+                    if event.type == e.EV_KEY and event.code == 116:
+                        # KEY_POWER
+                        if event.value == 0:
+                            self.handle_power_action()
 
-            elif self.power_device_2 and not self.power_device:
-                try:
-                    async for event in self.power_device_2.async_read_loop():
-                        self.logger.debug(
-                            f"Got event: "
-                            f"{event.type} | {event.code} | {event.value}"
-                        )
-                        if event.type == e.EV_KEY and event.code == 116:
-                            # KEY_POWER
-                            if event.value == 0:
-                                self.handle_power_action()
+            except Exception as err:
+                self.logger.error(
+                    f"{err} | Error reading events from power device."
+                )
+                self.logger.exception(err)
+                self.power_device = None
+                self.power_device_2 = None
 
-                except Exception as err:
-                    self.logger.error(
-                        f"{err} | Error reading events from power device."
-                    )
-                    self.logger.exception(err)
-                    self.power_device_2 = None
-
-            else:
                 self.logger.info("Attempting to grab controller device...")
                 self.get_powerkey()
                 await asyncio.sleep(DETECT_DELAY)
 
-    # Performs specific power actions based on user config.
     def handle_power_action(self):
+        """
+        Performs specific power actions based on user config.
+        :return:
+        """
         self.logger.debug(f"Power Action: {self.power_action}")
         match self.power_action:
             case "Suspend":
-                # For DeckUI Sessions
-                is_deckui = self.steam_ifrunning_deckui(
-                    "steam://shortpowerpress"
-                )
-
-                # For BPM and Desktop sessions
-                if not is_deckui:
-                    os.system('systemctl suspend')
+                os.system('systemctl suspend')
 
             case "Hibernate":
                 os.system('systemctl hibernate')
 
             case "Shutdown":
-                is_deckui = self.steam_ifrunning_deckui(
-                    "steam://longpowerpress"
-                )
+                os.system('systemctl poweroff')
 
-                if not is_deckui:
-                    os.system('systemctl poweroff')
-
-    # Handle FF event uploads
     async def capture_ff_events(self):
+        """
+        Handle FF event uploads
+        :return:
+        """
 
         ff_effect_id_set = set()
 
@@ -1172,8 +1220,11 @@ class HandheldController:
 
             if event.type == e.EV_FF:
                 # Forward FF event to controller.
-                self.controller_device.write(e.EV_FF, event.code,
-                                                 event.value)
+                self.controller_device.write(
+                    e.EV_FF,
+                    event.code,
+                    event.value
+                )
                 continue
 
             # Programs will submit
@@ -1230,6 +1281,10 @@ class HandheldController:
                 self.ui_device.end_erase(erase)
 
     def restore_hidden(self):
+        """
+        Deleting hidden events
+        :return:
+        """
         for hidden_event in os.listdir(HIDE_PATH):
             self.logger.debug(f'Restoring {hidden_event}')
             shutil.move(
@@ -1237,11 +1292,15 @@ class HandheldController:
                 "/dev/input/" + hidden_event
             )
 
-    # Emits passed or generated events to the virtual controller.
-    # This shouldn't be called directly for custom events,
-    # only to pass realtime events.
-    # Use emit_now and the device's event_queue.
-    async def emit_events(self, events: list):
+    async def emit_events(self, events: list[InputEvent]):
+        """
+        Emits passed or generated events to the virtual controller.
+        This shouldn't be called directly for custom events,
+        only to pass realtime events.
+        Use emit_now and the device's event_queue.
+        :param events: InputEvents list
+        :return:
+        """
         self.logger.debug(f'events: {type(events)}')
 
         for event in events:
@@ -1252,20 +1311,31 @@ class HandheldController:
             if event != events[-1]:
                 await asyncio.sleep(self.BUTTON_DELAY)
 
-    # Emit a single event. Skips some logic checks for optimization.
-    def emit_event(self, event):
+    def emit_event(self, event: InputEvent):
+        """
+        Emit a single event. Skips some logic checks for optimization.
+        :param event:
+        :return:
+        """
         self.logger.debug(f"Emitting event: {event}")
-        self.logger.debug(type(event))
         self.ui_device.write_event(event)
         self.ui_device.syn()
 
-    # Generates events from an event list.
-    # Can be called directly or when looping through
-    # the event queue.
-    async def emit_now(self, seed_event, event_list, value):
-        self.logger.debug(f'seed_event: {type(seed_event)}')
-        self.logger.debug(f'event_list: {type(event_list)}')
-        self.logger.debug(f'value: {type(value)}')
+    async def emit_now(
+            self,
+            seed_event: InputEvent,
+            event_list: list[InputEvent],
+            value: int
+    ):
+        """
+        Generates events from an event list.
+        Can be called directly or when looping through
+        the event queue.
+        :param seed_event:
+        :param event_list:
+        :param value:
+        :return:
+        """
         # Ignore malformed requests
         if not event_list:
             self.logger.error(
@@ -1337,12 +1407,32 @@ class HandheldController:
         elif size == 1:
             self.emit_event(events[0])
 
-    async def handle_key_down(self, seed_event, queued_event):
+    async def handle_key_down(
+            self,
+            seed_event: InputEvent,
+            queued_event: InputEvent
+    ):
+        """
+        Handling key down
+        :param seed_event:
+        :param queued_event:
+        :return:
+        """
         self.event_queue.append(queued_event)
         if queued_event in INSTANT_EVENTS:
             await self.emit_now(seed_event, queued_event, 1)
 
-    async def handle_key_up(self, seed_event, queued_event):
+    async def handle_key_up(
+            self,
+            seed_event: InputEvent,
+            queued_event: InputEvent
+    ):
+        """
+        Handling key up
+        :param seed_event:
+        :param queued_event:
+        :return:
+        """
         self.logger.debug(f'seed_event: {type(seed_event)}')
         self.logger.debug(f'queued_event: {type(queued_event)}')
         if queued_event in INSTANT_EVENTS:
@@ -1363,7 +1453,10 @@ class HandheldController:
                 self.last_button = None
 
     async def toggle_performance(self):
-
+        """
+        Switch performance mode
+        :return:
+        """
         if self.performance_mode == "--max-performance":
             self.performance_mode = "--power-saving"
             await self.do_rumble()
@@ -1394,18 +1487,18 @@ class HandheldController:
             self.logger.debug(
                 f'Thermal mode set to {self.thermal_mode}.')
 
-    def make_controller(self):
-
-        # Create the virtual controller.
-        self.ui_device = UInput(
-            CONTROLLER_EVENTS,
-            name='Handheld Controller',
-            bustype=0x3,
-            vendor=0x045e,
-            product=0x028e,
-            version=0x110
-        )
-
 
 def main():
+    """
+    Start of handycon
+    :return:
+    """
+    logging.basicConfig(
+        format="%(asctime)s |"
+               " %(filename)s:%(lineno)s:%(funcName)s |"
+               " %(message)s",
+        datefmt="%y%m%d_%H:%M:%S",
+        level=logging.DEBUG
+    )
+
     HandheldController()
