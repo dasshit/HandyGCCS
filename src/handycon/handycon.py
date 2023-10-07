@@ -1337,10 +1337,8 @@ class HandheldController:
         :param events: InputEvents list
         :return:
         """
-        logger.debug(f'events: {type(events)}')
 
         for event in events:
-            logger.debug(type(event))
             self.emit_event(event)
             # Pause between multiple events,
             # but not after the last one in the list.
@@ -1469,8 +1467,6 @@ class HandheldController:
         :param queued_event:
         :return:
         """
-        logger.debug(f'seed_event: {type(seed_event)}')
-        logger.debug(f'queued_event: {type(queued_event)}')
         if queued_event in INSTANT_EVENTS:
             self.event_queue.remove(queued_event)
             await self.emit_now(seed_event, queued_event, 0)
