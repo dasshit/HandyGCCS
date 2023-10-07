@@ -1169,6 +1169,7 @@ class HandheldController:
             self.logger.info("Attempting to grab controller device...")
             self.get_powerkey()
             await asyncio.sleep(DETECT_DELAY)
+            return
 
         while self.running:
             try:
