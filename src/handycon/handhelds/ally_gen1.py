@@ -7,13 +7,19 @@ from __future__ import annotations
 from types import MethodType
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from src.handycon.device_explorer import DeviceExplorer
+    from src.handycon.handycon import HandheldController
 
 # Partial imports
 from evdev import InputEvent
 
+from ..constants import \
+    EVENT_BTN_A, \
+    EVENT_BTN_B, \
+    EVENT_BTN_X, \
+    EVENT_BTN_Y
 
-def init_handheld(handycon: "DeviceExplorer"):
+
+def init_handheld(handycon: "HandheldController"):
     """
     Captures keyboard events and translates them to virtual device events.
     :param handycon:
@@ -34,7 +40,7 @@ def init_handheld(handycon: "DeviceExplorer"):
 
 
 async def process_event(
-        handycon: "DeviceExplorer",
+        handycon: "HandheldController",
         seed_event: InputEvent,
         active_keys: list[int]
 ):
@@ -59,6 +65,11 @@ async def process_event(
     button11 = handycon.button_map["button11"]
     button12 = handycon.button_map["button12"]
 
+    button_a = EVENT_BTN_A
+    button_b = EVENT_BTN_B
+    button_x = EVENT_BTN_X
+    button_y = EVENT_BTN_Y
+
     # Loop variables
     button_on = seed_event.value
     this_button = None
@@ -66,6 +77,11 @@ async def process_event(
     # Handle missed keys.
     if active_keys == [] and handycon.event_queue != []:
         this_button = handycon.event_queue[0]
+
+    if active_keys == [185] \
+            and button_on in [1, 2] \
+            and button_a not in handycon.event_queue:
+        handycon.event_queue.append(button_a)
 
     # BUTTON 1 (Default: Screenshot) Paddle + Y
     if active_keys == [184] \
