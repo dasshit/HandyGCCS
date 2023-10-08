@@ -147,6 +147,7 @@ class HandheldController(EventEmitter):
                         )
                         logger.debug(f"Active Keys: {active_keys_2}")
                         logger.debug(f"Queued events: {self.event_queue}")
+                        logger.debug('-----' * 10)
 
                         # Capture keyboard events
                         # and translate them to mapped events.
