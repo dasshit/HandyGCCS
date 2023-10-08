@@ -70,7 +70,7 @@ class HandheldController(DeviceExplorer):
                 "Input management not possible. Exiting."
             )
             exit()
-        super(DeviceExplorer).__init__()
+        DeviceExplorer.__init__(self)
         self.ui_device = UInput(
             CONTROLLER_EVENTS,
             name='Handheld Controller',
