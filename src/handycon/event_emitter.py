@@ -70,7 +70,7 @@ class EventEmitter(DeviceExplorer):
         :param event:
         :return:
         """
-        logger.debug(f"Emitting event: {event}")
+        # logger.debug(f"Emitting event: {event}")
         self.ui_device.write_event(event)
         self.ui_device.syn()
 
