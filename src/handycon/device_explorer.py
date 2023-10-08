@@ -93,6 +93,15 @@ class DeviceExplorer:
     keyboard_2_path: Optional[Path] = None
 
     def __init__(self):
+        logger.info(
+            "Starting Handhend Game Console Controller Service..."
+        )
+        if self.is_process_running("opengamepadui"):
+            logger.warning(
+                "Detected an OpenGamepadUI Process. "
+                "Input management not possible. Exiting."
+            )
+            exit()
         HIDE_PATH.mkdir(parents=True, exist_ok=True)
         self.restore_hidden()
         self.get_user()
@@ -157,6 +166,22 @@ class DeviceExplorer:
         for line in all_info.split("\n"):
             if "vendor_id" in line:
                 return re.sub(".*vendor_id.*:", "", line, 1).strip()
+
+    @staticmethod
+    def is_process_running(name: str) -> bool:
+        """
+        Checking if process with name running
+        :param name: Process name
+        :return:
+        """
+        cmd = f"ps -Af | egrep '{name}' | egrep 'grep' -v | wc -l"
+        read_proc = os.popen(cmd).read()
+        proc_count = int(read_proc)
+        if proc_count > 0:
+            logger.debug(f'Process {name} is running.')
+            return True
+        logger.debug(f'Process {name} is NOT running.')
+        return False
 
     @staticmethod
     def restore_hidden():
@@ -331,7 +356,7 @@ class DeviceExplorer:
                 logger.error(
                     f"{system_id} is not currently supported by this tool. "
                     f"Open an issue on Github "
-                    f"at https://github.ShadowBlip/HandyGCCS if this is a bug. "
+                    f"at https://github.ShadowBlip/HandyGCCS if this is a bug."
                     f"If possible, se run the capture-system.py "
                     f"utility found on the GitHub repository "
                     f"and upload the file with your issue."
