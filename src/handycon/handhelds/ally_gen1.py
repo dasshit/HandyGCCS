@@ -78,13 +78,13 @@ async def process_event(
     if active_keys == [] and handycon.event_queue != []:
         this_button = handycon.event_queue[0]
 
-    if active_keys == [185] \
-            and button_on in [1, 2]:
-        await handycon.emit_now(seed_event, button_a, 1)
-    elif active_keys == [] \
-            and seed_event.code == 185 \
-            and button_on == 0:
-        await handycon.emit_now(seed_event, button_a, 0)
+    # if active_keys == [185] \
+    #         and button_on in [1, 2]:
+    #     await handycon.emit_now(seed_event, button_a, 1)
+    # elif active_keys == [] \
+    #         and seed_event.code == 185 \
+    #         and button_on == 0:
+    #     await handycon.emit_now(seed_event, button_a, 0)
 
     # BUTTON 1 (Default: Screenshot) Paddle + Y
     if active_keys == [184] \
