@@ -189,6 +189,18 @@ class HandheldController(EventEmitter):
                         # Up to you I guess...
                         if event.type in [e.EV_FF, e.EV_UINPUT]:
                             continue
+                        # Loop variables
+                        active_keys = self.controller_device.active_keys()
+
+                        # Debugging variables
+                        logger.debug(
+                            f"Seed Value: {event.value}, "
+                            f"Seed Code: {event.code}, "
+                            f"Seed Type: {event.type}."
+                        )
+                        logger.debug(f"Active Keys: {active_keys}")
+                        logger.debug(f"Queued events: {self.event_queue}")
+                        logger.debug('-----' * 10)
 
                         # Output the event.
                         self.emit_event(event)
