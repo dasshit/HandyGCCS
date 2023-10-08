@@ -82,6 +82,11 @@ async def process_event(
             and button_on in [1, 2] \
             and button_a not in handycon.event_queue:
         handycon.event_queue.append(button_a)
+    elif active_keys == [] \
+            and seed_event.code == 185 \
+            and button_on == 0 \
+            and button_a in handycon.event_queue:
+        this_button = button_a
 
     # BUTTON 1 (Default: Screenshot) Paddle + Y
     if active_keys == [184] \
