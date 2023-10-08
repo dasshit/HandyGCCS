@@ -254,184 +254,90 @@ class DeviceExplorer:
         cpu_vendor = self.get_cpu_vendor()
         logger.debug(f"Found CPU Vendor: {cpu_vendor}")
 
-        # ANBERNIC Devices
-        if system_id in (
-                "Win600",
-        ):
-            self.system_type = "ANB_GEN1"
-            anb_gen1.init_handheld(self)
+        match system_id:
+            case "Win600":
+                anb_gen1.init_handheld(self)
+            case "AOKZOE A1 AR07":
+                aok_gen1.init_handheld(self)
+            case "AOKZOE A1 Pro":
+                aok_gen2.init_handheld(self)
+            case "ROG Ally RC71L_RC71L":
+                ally_gen1.init_handheld(self)
+            case "AYA NEO FOUNDER", \
+                 "AYA NEO 2021", \
+                 "AYANEO 2021", \
+                 "AYANEO 2021 Pro", \
+                 "AYANEO 2021 Pro Retro Power":
+                aya_gen1.init_handheld(self)
+            case "NEXT", \
+                 "NEXT Pro", \
+                 "NEXT Advance", \
+                 "AYANEO NEXT", \
+                 "AYANEO NEXT Pro", \
+                 "AYANEO NEXT Advance":
+                aya_gen2.init_handheld(self)
+            case "AIR", "AIR Pro":
+                aya_gen3.init_handheld(self)
+            case "AYANEO 2", "GEEK":
+                aya_gen4.init_handheld(self)
+            case "AIR Plus":
+                if cpu_vendor == "GenuineIntel":
+                    aya_gen7.init_handheld(self)
+                else:
+                    aya_gen5.init_handheld(self)
+            case "AYANEO 2S", "GEEK 1S", "AIR 1S":
+                aya_gen6.init_handheld(self)
+            case "Loki Max":
+                ayn_gen1.init_handheld(self)
+            case "Loki Zero":
+                ayn_gen2.init_handheld(self)
+            case "Loki MiniPro":
+                ayn_gen3.init_handheld(self)
 
-        # AOKZOE Devices
-        elif system_id in (
-                "AOKZOE A1 AR07",
-        ):
-            self.system_type = "AOK_GEN1"
-            aok_gen1.init_handheld(self)
+            # GPD Devices.
+            # Have 2 buttons with 3 modes (left, right, both)
+            case "G1618-03":
+                gpd_gen1.init_handheld(self)
+            case "G1619-04":
+                gpd_gen2.init_handheld(self)
+            case "G1618-04":
+                gpd_gen3.init_handheld(self)
 
-        elif system_id in (
-                "AOKZOE A1 Pro",
-        ):
-            self.system_type = "AOK_GEN2"
-            aok_gen2.init_handheld(self)
+            # ONEXPLAYER and AOKZOE devices.
+            # BIOS have inlete DMI data
+            # and most models report as "ONE XPLAYER" or "ONEXPLAYER".
+            case "ONE XPLAYER", "ONEXPLAYER":
+                # GEN 1
+                if cpu_vendor == "GenuineIntel":
+                    oxp_gen1.init_handheld(self)
+                # GEN 2
+                else:
+                    oxp_gen2.init_handheld(self)
+            # GEN 3
+            case "ONEXPLAYER mini A07":
+                oxp_gen3.init_handheld(self)
+            # GEN 4
+            case "ONEXPLAYER Mini Pro":
+                oxp_gen4.init_handheld(self)
+            # GEN 5
+            # case "ONEXPLAYER 2", "ONEXPLAYER 2 Pro":
+            #     self.system_type = "OXP_GEN5"
+            #     oxp_gen5.init_handheld(self)
+            # GEN 6
+            case "ONEXPLAYER F1":
+                oxp_gen6.init_handheld(self)
+            # Devices that aren't supported could cause issues, exit.
+            case _:
+                logger.error(
+                    f"{system_id} is not currently supported by this tool. "
+                    f"Open an issue on Github "
+                    f"at https://github.ShadowBlip/HandyGCCS if this is a bug. "
+                    f"If possible, se run the capture-system.py "
+                    f"utility found on the GitHub repository "
+                    f"and upload the file with your issue."
+                )
+                exit(0)
 
-        # ASUS Devices
-        elif system_id in (
-                "ROG Ally RC71L_RC71L",
-        ):
-            self.system_type = "ALY_GEN1"
-            ally_gen1.init_handheld(self)
-
-        # Aya Neo Devices
-        elif system_id in (
-                "AYA NEO FOUNDER",
-                "AYA NEO 2021",
-                "AYANEO 2021",
-                "AYANEO 2021 Pro",
-                "AYANEO 2021 Pro Retro Power",
-        ):
-            self.system_type = "AYA_GEN1"
-            aya_gen1.init_handheld(self)
-
-        elif system_id in (
-                "NEXT",
-                "NEXT Pro",
-                "NEXT Advance",
-                "AYANEO NEXT",
-                "AYANEO NEXT Pro",
-                "AYANEO NEXT Advance",
-        ):
-            self.system_type = "AYA_GEN2"
-            aya_gen2.init_handheld(self)
-
-        elif system_id in (
-                "AIR",
-                "AIR Pro",
-        ):
-            self.system_type = "AYA_GEN3"
-            aya_gen3.init_handheld(self)
-
-        elif system_id in (
-                "AYANEO 2",
-                "GEEK",
-        ):
-            self.system_type = "AYA_GEN4"
-            aya_gen4.init_handheld(self)
-
-        elif system_id in (
-                "AIR Plus",
-        ):
-            if cpu_vendor == "GenuineIntel":
-                self.system_type = "AYA_GEN7"
-                aya_gen7.init_handheld(self)
-            else:
-                self.system_type = "AYA_GEN5"
-                aya_gen5.init_handheld(self)
-
-        elif system_id in (
-                "AYANEO 2S",
-                "GEEK 1S",
-                "AIR 1S",
-        ):
-            self.system_type = "AYA_GEN6"
-            aya_gen6.init_handheld(self)
-
-        # Ayn Devices
-        elif system_id in (
-                "Loki Max",
-        ):
-            self.system_type = "AYN_GEN1"
-            ayn_gen1.init_handheld(self)
-
-        elif system_id in (
-                "Loki Zero",
-        ):
-            self.system_type = "AYN_GEN2"
-            ayn_gen2.init_handheld(self)
-
-        elif system_id in (
-                "Loki MiniPro",
-        ):
-            self.system_type = "AYN_GEN3"
-            ayn_gen3.init_handheld(self)
-
-        # GPD Devices.
-        # Have 2 buttons with 3 modes (left, right, both)
-        elif system_id in (
-                "G1618-03",  # Win3
-        ):
-            self.system_type = "GPD_GEN1"
-            gpd_gen1.init_handheld(self)
-
-        elif system_id in (
-                "G1619-04",  # WinMax2
-        ):
-            self.system_type = "GPD_GEN2"
-            gpd_gen2.init_handheld(self)
-
-        elif system_id in (
-                "G1618-04",  # Win4
-        ):
-            self.system_type = "GPD_GEN3"
-            gpd_gen3.init_handheld(self)
-
-        # ONEXPLAYER and AOKZOE devices.
-        # BIOS have inlete DMI data
-        # and most models report as "ONE XPLAYER" or "ONEXPLAYER".
-        elif system_id in (
-                "ONE XPLAYER",
-                "ONEXPLAYER",
-        ):
-
-            # GEN 1
-            if cpu_vendor == "GenuineIntel":
-                self.system_type = "OXP_GEN1"
-                oxp_gen1.init_handheld(self)
-
-            # GEN 2
-            else:
-                self.system_type = "OXP_GEN2"
-                oxp_gen2.init_handheld(self)
-
-        # GEN 3
-        elif system_id in (
-                "ONEXPLAYER mini A07",
-        ):
-            self.system_type = "OXP_GEN3"
-            oxp_gen3.init_handheld(self)
-
-        # GEN 4
-        elif system_id in (
-                "ONEXPLAYER Mini Pro",
-        ):
-            self.system_type = "OXP_GEN4"
-            oxp_gen4.init_handheld(self)
-
-        # GEN 5
-        # elif system_id in (
-        #     "ONEXPLAYER 2",
-        #     "ONEXPLAYER 2 Pro",
-        # ):
-        #    self.system_type = "OXP_GEN5"
-        #    oxp_gen5.init_handheld(self)
-
-        # GEN 6
-        elif system_id in (
-                "ONEXPLAYER F1",
-        ):
-            self.system_type = "OXP_GEN6"
-            oxp_gen6.init_handheld(self)
-
-        # Devices that aren't supported could cause issues, exit.
-        else:
-            logger.error(
-                f"{system_id} is not currently supported by this tool. "
-                f"Open an issue on Github "
-                f"at https://github.ShadowBlip/HandyGCCS if this is a bug. "
-                f"If possible, se run the capture-system.py "
-                f"utility found on the GitHub repository "
-                f"and upload the file with your issue."
-            )
-            exit(0)
         logger.info(
             f"Identified host system as {system_id} "
             f"and configured defaults for {self.system_type}."

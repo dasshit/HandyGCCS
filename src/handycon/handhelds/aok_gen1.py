@@ -18,6 +18,7 @@ def init_handheld(handycon: "DeviceExplorer"):
     :param handycon:
     :return:
     """
+    handycon.system_type = "AOK_GEN1"
     handycon.process_event = MethodType(process_event, handycon)
     handycon.BUTTON_DELAY = 0.09
     handycon.CAPTURE_CONTROLLER = True

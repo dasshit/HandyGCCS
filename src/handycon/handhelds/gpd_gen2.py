@@ -17,6 +17,7 @@ def init_handheld(handycon: "DeviceExplorer"):
     :param handycon:
     :return:
     """
+    handycon.system_type = "GPD_GEN2"
     handycon.process_event = MethodType(process_event, handycon)
     handycon.BUTTON_DELAY = 0.11
     handycon.CAPTURE_CONTROLLER = True

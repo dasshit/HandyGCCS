@@ -17,6 +17,7 @@ def init_handheld(handycon: "DeviceExplorer"):
     :param handycon:
     :return:
     """
+    handycon.system_type = "AYA_GEN3"
     handycon.process_event = MethodType(process_event, handycon)
     handycon.BUTTON_DELAY = 0.10
     handycon.CAPTURE_CONTROLLER = True
