@@ -261,21 +261,25 @@ EVENT_SCR: list[
 EVENT_BTN_A: list[
     list[int]
 ] = [
+    [e.EV_KEY, e.BTN_MODE],
     [e.EV_KEY, e.BTN_A]
 ]
 EVENT_BTN_B: list[
     list[int]
 ] = [
+    [e.EV_KEY, e.BTN_MODE],
     [e.EV_KEY, e.BTN_B]
 ]
 EVENT_BTN_X: list[
     list[int]
 ] = [
+    [e.EV_KEY, e.BTN_MODE],
     [e.EV_KEY, e.BTN_X]
 ]
 EVENT_BTN_Y: list[
     list[int]
 ] = [
+    [e.EV_KEY, e.BTN_MODE],
     [e.EV_KEY, e.BTN_Y]
 ]
 EVENT_TOGGLE_GYRO: list[str] = ["Toggle Gyro"]
