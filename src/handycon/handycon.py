@@ -739,7 +739,7 @@ def main():
                '%(name)s - '
                '(%(filename)s).%(funcName)s(%(lineno)d) - '
                '%(message)s',
-        level=logging.DEBUG
+        level=logging.INFO
     )
 
     HandheldController()
