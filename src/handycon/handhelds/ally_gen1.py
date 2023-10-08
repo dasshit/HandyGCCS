@@ -7,13 +7,13 @@ from __future__ import annotations
 from types import MethodType
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from src.handycon.event_emitter import EventEmitter
+    from src.handycon.device_explorer import DeviceExplorer
 
 # Partial imports
 from evdev import InputEvent
 
 
-def init_handheld(handycon: "EventEmitter"):
+def init_handheld(handycon: "DeviceExplorer"):
     """
     Captures keyboard events and translates them to virtual device events.
     :param handycon:
@@ -34,7 +34,7 @@ def init_handheld(handycon: "EventEmitter"):
 
 
 async def process_event(
-        handycon: "EventEmitter",
+        handycon: "DeviceExplorer",
         seed_event: InputEvent,
         active_keys: list[int]
 ):

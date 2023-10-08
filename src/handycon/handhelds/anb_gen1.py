@@ -6,12 +6,12 @@ Copyright 2022-2023 Derek J. Clark <derekjohn.clark@gmail.com>
 from types import MethodType
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from src.handycon.event_emitter import EventEmitter
+    from src.handycon.device_explorer import DeviceExplorer
 
 from evdev import ecodes as e, InputEvent
 
 
-def init_handheld(handycon: "EventEmitter"):
+def init_handheld(handycon: "DeviceExplorer"):
     """
     Captures keyboard events and translates them to virtual device events.
     :param handycon:
@@ -31,7 +31,7 @@ def init_handheld(handycon: "EventEmitter"):
 
 # Captures keyboard events and translates them to virtual device events.
 async def process_event(
-        handycon: "EventEmitter",
+        handycon: "DeviceExplorer",
         seed_event: InputEvent,
         active_keys: list[int]
 ):
