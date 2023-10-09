@@ -17,7 +17,7 @@ from .constants import \
     CONTROLLER_EVENTS, \
     CHIMERA_LAUNCHER_PATH, \
     FF_DELAY, \
-    INSTANT_EVENTS, QUEUED_EVENTS
+    INSTANT_EVENTS, QUEUED_EVENTS, EVENT_BTN_A, EVENT_BTN_X
 
 from .device_explorer import DeviceExplorer
 
@@ -284,12 +284,234 @@ class EventEmitter(DeviceExplorer):
                 "su", self.USER, "-c", f"'{steam_path} -ifrunning {cmd}'"
             ])
             logger.debug(cmd)
-            result = os.system(cmd)
+            os.system(cmd)
             return True
         except Exception as err:
             logger.error(f"{err} | Error sending and to Steam.")
             logger.exception(err)
             return False
+
+    async def process_event(
+            self,
+            seed_event: InputEvent,
+            active_keys: list[int]
+    ):
+        """
+        Translate event to button press
+        :param handycon:
+        :param seed_event:
+        :param active_keys:
+        :return:
+        """
+        logger.debug(f'seed_event: {seed_event}')
+        logger.debug(f'active_keys: {active_keys}')
+        # Button map shortcuts for easy reference.
+        button1 = self.button_map["button1"]  # Default Screenshot
+        button2 = self.button_map["button2"]  # Default QAM
+        button3 = self.button_map["button3"]  # Default ESC
+        button4 = self.button_map["button4"]  # Default OSK
+        button5 = self.button_map["button5"]  # Default MODE
+        button6 = self.button_map["button6"]
+        # button7 = self.button_map["button7"]
+        button8 = self.button_map["button8"]
+        button9 = self.button_map["button9"]
+        button10 = self.button_map["button10"]
+        button11 = self.button_map["button11"]
+        button12 = self.button_map["button12"]
+
+        button_a = EVENT_BTN_A
+        # button_b = EVENT_BTN_B
+        button_x = EVENT_BTN_X
+        # button_y = EVENT_BTN_Y
+
+        # Loop variables
+        button_on = seed_event.value
+        this_button = None
+
+        # Handle missed keys.
+        if active_keys == [] and self.event_queue != []:
+            this_button = self.event_queue[0]
+
+        if active_keys == [186, 307] \
+                and seed_event.code == 186 \
+                and button_on == 1:
+            self.event_queue.append(["Open Keyboard"])
+        elif active_keys == [307] \
+                and seed_event.code == 186 \
+                and button_on == 0:
+            this_button = ["Open Keyboard"]
+
+        if active_keys == [187] \
+                and button_on in [1, 2]:
+            await self.emit_now(seed_event, button_a, 1)
+        elif active_keys == [] \
+                and seed_event.code == 187 \
+                and button_on == 0:
+            await self.emit_now(seed_event, button_a, 0)
+
+        if active_keys == [188] \
+                and button_on in [1, 2]:
+            await self.emit_now(seed_event, button_x, 1)
+        elif active_keys == [] \
+                and seed_event.code == 188 \
+                and button_on == 0:
+            await self.emit_now(seed_event, button_x, 0)
+
+        # BUTTON 1 (Default: Screenshot) Paddle + Y
+        if active_keys == [184] \
+                and button_on == 1 \
+                and button1 not in self.event_queue:
+            self.event_queue.append(button1)
+        elif active_keys == [] \
+                and seed_event.code in [184, 185] \
+                and button_on == 0 \
+                and button1 in self.event_queue:
+            this_button = button1
+
+        # BUTTON 2 (Default: QAM) Armory Crate Button Short Press
+        if active_keys == [148] \
+                and button_on == 1 \
+                and button2 not in self.event_queue:
+            self.event_queue.append(button2)
+        elif active_keys == [] \
+                and seed_event.code in [148] \
+                and button_on == 0 \
+                and button2 in self.event_queue:
+            this_button = button2
+
+        # BUTTON 3 (Default: ESC) Paddle + X Temp disabled, goes nuts.
+        # This event triggers from KEYBOARD_2.
+        if active_keys == [25, 125] \
+                and button_on == 1 \
+                and button3 not in self.event_queue:
+            self.event_queue.append(button3)
+        elif active_keys == [] \
+                and seed_event.code in [49, 125, 185] \
+                and button_on == 0 \
+                and button3 in self.event_queue:
+            this_button = button3
+
+        # BUTTON 4 (Default: OSK) Paddle + D-Pad UP
+        if active_keys == [88] \
+                and button_on == 1 \
+                and button4 not in self.event_queue:
+            self.event_queue.append(button4)
+        elif active_keys == [] \
+                and seed_event.code in [88, 185] \
+                and button_on == 0 \
+                and button4 in self.event_queue:
+            this_button = button4
+
+        # BUTTON 5 (Default: Mode) Control Center Short Press.
+        if active_keys == [186] \
+                and button_on == 1 \
+                and button5 not in self.event_queue:
+            self.event_queue.append(button5)
+        elif active_keys == [] \
+                and seed_event.code in [186] \
+                and button_on == 0 \
+                and button5 in self.event_queue:
+            this_button = button5
+
+        # BUTTON 6 (Default: Launch Chimera) Paddle + A
+        if active_keys == [68] \
+                and button_on == 1 \
+                and button6 not in self.event_queue:
+            self.event_queue.append(button6)
+        elif active_keys == [] \
+                and seed_event.code in [68, 185] \
+                and button_on == 0 \
+                and button6 in self.event_queue:
+            this_button = button6
+
+        # BUTTON 7 (Default: Toggle Performance) Armory Crate Button Long Press
+        # This button triggers immediate down/up
+        # after holding for ~1s an F17 and then
+        # released another down/up for F18 on release.
+        # We use the F18 "KEY_UP" for release.
+        # if active_keys == [187] \
+        #         and button_on == 1 \
+        #         and button7 not in self.event_queue:
+        #     self.event_queue.append(button7)
+        #     await self.do_rumble(0, 150, 1000, 0)
+        # elif active_keys == [] \
+        #         and seed_event.code in [188] \
+        #         and button_on == 0 \
+        #         and button7 in self.event_queue:
+        #     this_button = button7
+
+        # BUTTON 8 (Default: Mode) Control Center Long Press.
+        # This event triggers from KEYBOARD_2.
+        if active_keys == [29, 56, 111] \
+                and button_on == 1 \
+                and button8 not in self.event_queue:
+            self.event_queue.append(button8)
+            await self.do_rumble(0, 150, 1000, 0)
+        elif active_keys == [] \
+                and seed_event.code in [29, 56, 111] \
+                and button_on == 0 \
+                and button8 in self.event_queue:
+            this_button = button8
+
+        # BUTTON 9 (Default: Toggle Mouse) Paddle + D-Pad DOWN
+        # This event triggers from KEYBOARD_2.
+        if active_keys == [1, 29, 42] \
+                and button_on == 1 \
+                and button9 not in self.event_queue:
+            self.event_queue.append(button9)
+        elif active_keys == [] \
+                and seed_event.code in [1, 29, 42, 185] \
+                and button_on == 0 \
+                and button9 in self.event_queue:
+            this_button = button9
+
+        # BUTTON 10 (Default: ALT+TAB) Paddle + D-Pad LEFT
+        # This event triggers from KEYBOARD_2.
+        if active_keys == [32, 125] \
+                and button_on == 1 \
+                and button10 not in self.event_queue:
+            self.event_queue.append(button10)
+        elif active_keys == [] \
+                and seed_event.code in [32, 125, 185] \
+                and button_on == 0 \
+                and button10 in self.event_queue:
+            this_button = button10
+
+        # BUTTON 11 (Default: KILL) Paddle + D-Pad RIGHT
+        # This event triggers from KEYBOARD_2.
+        if active_keys == [15, 125] \
+                and button_on == 1 \
+                and button11 not in self.event_queue:
+            self.event_queue.append(button11)
+        elif active_keys == [] \
+                and seed_event.code in [15, 125, 185] \
+                and button_on == 0 \
+                and button11 in self.event_queue:
+            this_button = button11
+
+        # BUTTON 12 (Default: Toggle Gyro) Paddle + B
+        # This event triggers from KEYBOARD_2.
+        if active_keys == [49, 125] \
+                and button_on == 1 \
+                and button12 not in self.event_queue:
+            self.event_queue.append(button12)
+        elif active_keys == [] \
+                and seed_event.code in [25, 125, 185] \
+                and button_on == 0 \
+                and button12 in self.event_queue:
+            this_button = button12
+
+        # Create list of events to fire.
+        # Handle new button presses.
+        if this_button and not self.last_button:
+            self.event_queue.remove(this_button)
+            self.last_button = this_button
+            await self.emit_now(seed_event, this_button, 1)
+
+        # Clean up old button presses.
+        elif self.last_button and not this_button:
+            await self.emit_now(seed_event, self.last_button, 0)
+            self.last_button = None
 
     def handle_power_action(self):
         """

@@ -13,19 +13,14 @@ import sys
 import warnings
 
 # Local modules
+from brightness_controller import ScreenBrightnessController
 from .event_emitter import EventEmitter
 from .constants import \
     HIDE_PATH, \
     DETECT_DELAY
 
 # Partial imports
-from evdev import \
-    ecodes as e, \
-    ff, \
-    InputDevice, \
-    InputEvent, \
-    list_devices, \
-    UInput
+from evdev import ecodes as e
 
 
 logger = logging.getLogger('handycon')
@@ -43,6 +38,7 @@ class HandheldController(EventEmitter):
 
     def __init__(self):
         EventEmitter.__init__(self)
+        self.brightness = ScreenBrightnessController()
 
         # Run asyncio loop to capture all events.
         self.loop = asyncio.get_event_loop()
@@ -159,12 +155,10 @@ class HandheldController(EventEmitter):
 
                         # Capture keyboard events
                         # and translate them to mapped events.
-                        match self.system_type:
-                            case "ALY_GEN1":
-                                await self.process_event(
-                                    seed_event,
-                                    active_keys
-                                )
+                        await self.process_event(
+                            seed_event,
+                            active_keys
+                        )
 
                 except Exception as err:
                     logger.error(
