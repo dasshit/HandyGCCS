@@ -562,7 +562,10 @@ class EventEmitter(DeviceExplorer):
         # Create list of events to fire.
         # Handle new button presses.
         if this_button and not self.last_button:
-            self.event_queue.remove(this_button)
+            try:
+                self.event_queue.remove(this_button)
+            except ValueError:
+                pass
             self.last_button = this_button
             await self.emit_now(seed_event, this_button, 1)
 
