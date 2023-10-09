@@ -273,6 +273,8 @@ async def process_event(
     :param active_keys:
     :return:
     """
+    logger.debug(f'seed_event: {seed_event}')
+    logger.debug(f'active_keys: {active_keys}')
     # Button map shortcuts for easy reference.
     button1 = handycon.button_map["button1"]  # Default Screenshot
     button2 = handycon.button_map["button2"]  # Default QAM
