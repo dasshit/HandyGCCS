@@ -284,8 +284,8 @@ class EventEmitter(DeviceExplorer):
                 "su", self.USER, "-c", f"'{steam_path} -ifrunning {cmd}'"
             ])
             logger.debug(cmd)
-            result = subprocess.run(cmd)
-            return result.returncode == 0
+            result = os.system(cmd)
+            return True
         except Exception as err:
             logger.error(f"{err} | Error sending and to Steam.")
             logger.exception(err)
