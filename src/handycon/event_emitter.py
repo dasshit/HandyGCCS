@@ -280,7 +280,7 @@ class EventEmitter(DeviceExplorer):
         steam_path = self.HOME_PATH / '.steam/root/ubuntu12_32/steam'
         try:
             result = subprocess.run([
-                "su", self.USER, "-c", f"{steam_path} -ifrunning {cmd}"
+                "su", self.USER, "-c", f"'{steam_path} -ifrunning {cmd}'"
             ])
             return result.returncode == 0
         except Exception as err:
