@@ -42,10 +42,10 @@ class ScreenBrightnessController:
 
     def set_brightness(self, value: int) -> bool:
         try:
-            assert value <= self.max_brightness, \
-                'New value is bigger than display brightness max value'
-            assert value >= 0, \
-                f'Wrong value for screen brightness: {value}'
+            if value > self.max_brightness:
+                value = self.max_brightness
+            elif value < 0:
+                value = 0
             assert value != self.get_current_brightness(), \
                 'New value == current brightness value'
             self.set_display_brightness(value)

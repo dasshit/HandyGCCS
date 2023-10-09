@@ -109,9 +109,9 @@ class EventEmitter(DeviceExplorer):
                 return
             match event_list[0]:
                 case "Increase brightness":
-                    self.brightness.increase_brightness(35)
+                    self.brightness.increase_brightness(25)
                 case "Decrease brightness":
-                    self.brightness.decrease_brightness(35)
+                    self.brightness.decrease_brightness(25)
                 case "Open Keyboard":
                     self.steam_ifrunning_deckui('steam://open/keyboard')
                 case "Open Chimera":
