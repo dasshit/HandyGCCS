@@ -277,11 +277,12 @@ class EventEmitter(DeviceExplorer):
         if not is_deckui:
             return False
 
-        steam_path = self.HOME_PATH / '.steam/root/ubuntu12_32/steam'
+        # steam_path = self.HOME_PATH / '.steam/root/ubuntu12_32/steam'
+        steam_path = 'steam'
         try:
-            cmd = [
+            cmd = ' '.join([
                 "su", self.USER, "-c", f"'{steam_path} -ifrunning {cmd}'"
-            ]
+            ])
             logger.debug(cmd)
             result = subprocess.run(cmd)
             return result.returncode == 0
