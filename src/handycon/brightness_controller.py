@@ -132,7 +132,10 @@ class BrightnessController:
 
     def switch_led_mode(self):
         try:
-            cmd = f"openrgb -d 0 -m '{next(self.led_mods)}'"
+            cmd = f"openrgb " \
+                  f"-d 'ASUS ROG Ally' " \
+                  f"-m '{next(self.led_mods)}' " \
+                  f"--noautoconnect"
             logger.info(f'CMD: {cmd}')
             os.system(cmd)
         except Exception as error:
