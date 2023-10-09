@@ -14,7 +14,7 @@ from evdev import \
     UInput
 
 from .brightness_controller import \
-    ScreenBrightnessController
+    BrightnessController
 from .constants import \
     CONTROLLER_EVENTS, \
     CHIMERA_LAUNCHER_PATH, \
@@ -40,7 +40,7 @@ class EventEmitter(DeviceExplorer):
 
     def __init__(self):
         DeviceExplorer.__init__(self)
-        self.brightness = ScreenBrightnessController()
+        self.brightness = BrightnessController()
         self.ui_device = UInput(
             CONTROLLER_EVENTS,
             name='Handheld Controller',
@@ -108,10 +108,14 @@ class EventEmitter(DeviceExplorer):
                 )
                 return
             match event_list[0]:
-                case "Increase brightness":
-                    self.brightness.increase_brightness(25)
-                case "Decrease brightness":
-                    self.brightness.decrease_brightness(25)
+                case "Increase screen brightness":
+                    self.brightness.increase_screen_brightness(25)
+                case "Decrease screen brightness":
+                    self.brightness.decrease_screen_brightness(25)
+                case "Increase led brightness":
+                    self.brightness.increase_led_brightness()
+                case "Decrease led brightness":
+                    self.brightness.decrease_led_brightness()
                 case "Open Keyboard":
                     self.steam_ifrunning_deckui('steam://open/keyboard')
                 case "Open Chimera":
@@ -342,20 +346,29 @@ class EventEmitter(DeviceExplorer):
         if active_keys == [186, 311] \
                 and seed_event.code == 186 \
                 and button_on == 1:
-            self.event_queue.append(["Increase brightness"])
+            self.event_queue.append(["Increase screen brightness"])
         elif active_keys == [311] \
                 and seed_event.code == 186 \
                 and button_on == 0:
-            this_button = ["Increase brightness"]
+            this_button = ["Increase screen brightness"]
+
+        if active_keys == [148, 311] \
+                and seed_event.code == 148 \
+                and button_on == 1:
+            self.event_queue.append(["Increase led brightness"])
+        elif active_keys == [311] \
+                and seed_event.code == 148 \
+                and button_on == 0:
+            this_button = ["Increase led brightness"]
 
         if active_keys == [186, 310] \
                 and seed_event.code == 186 \
                 and button_on == 1:
-            self.event_queue.append(["Decrease brightness"])
+            self.event_queue.append(["Decrease screen brightness"])
         elif active_keys == [310] \
                 and seed_event.code == 186 \
                 and button_on == 0:
-            this_button = ["Decrease brightness"]
+            this_button = ["Decrease screen brightness"]
 
         if active_keys == [186, 307] \
                 and seed_event.code == 186 \

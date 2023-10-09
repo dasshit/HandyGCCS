@@ -1,14 +1,20 @@
 import logging
+import os
 import pathlib
 
 
 logger = logging.getLogger('handycon')
 
 
-class ScreenBrightnessController:
+class BrightnessController:
 
     def __init__(self):
         self.current_brightness = self.get_current_brightness()
+        self.led_path = pathlib.Path(
+            '/sys/class/leds/asus'
+            '::kbd_backlight/device/leds/asus'
+            '::kbd_backlight/brightnes'
+        )
 
     @property
     def display_path(self) -> pathlib.Path:
@@ -53,14 +59,57 @@ class ScreenBrightnessController:
             logger.debug(f'Cant assign new value: {type(error)}{error}')
             return False
 
-    def increase_brightness(self, value: int = 10):
+    def increase_screen_brightness(self, value: int = 10):
         current_brightness = self.get_current_brightness()
         self.set_brightness(
             current_brightness + value
         )
 
-    def decrease_brightness(self, value: int = 10):
+    def decrease_screen_brightness(self, value: int = 10):
         current_brightness = self.get_current_brightness()
         self.set_brightness(
             current_brightness - value
+        )
+
+    def turn_led_on(self):
+        os.system(
+            "brightnessctl -d 'asus::kbd_backlight' s 33%"
+        )
+
+    def get_led_brightness(self) -> int:
+        try:
+            return int(
+                self.led_path.read_text()
+            )
+        except Exception as error:
+            logger.error(
+                f'Error while setting new value '
+                f'for led brightness'
+            )
+            logger.exception(error)
+            return 0
+
+    def set_led_brightness(self, value):
+        if value < 0:
+            value = 0
+        elif value > 3:
+            value = 3
+
+        self.led_path.write_text(f'{value}\n')
+
+    def increase_led_brightness(self):
+        current_brightness = self.get_led_brightness()
+        if current_brightness == 0:
+            os.system(
+                "brightnessctl -d 'asus::kbd_backlight' s 33%"
+            )
+        else:
+            self.set_led_brightness(
+                current_brightness + 1
+            )
+
+    def decrease_led_brightness(self):
+        current_brightness = self.get_led_brightness()
+        self.set_led_brightness(
+            current_brightness - 1
         )
