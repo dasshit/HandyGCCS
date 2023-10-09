@@ -130,7 +130,7 @@ class BrightnessController:
 
     def switch_led_mode(self):
         try:
-            cmd = f"openrgb -d 0 -m '{next(self.led_mods)}"
+            cmd = f"openrgb -d 0 -m '{next(self.led_mods)}'"
             logger.debug(f'CMD: {cmd}')
             os.system(cmd)
         except Exception as error:
