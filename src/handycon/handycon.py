@@ -138,7 +138,7 @@ class HandheldController(EventEmitter):
         while self.running:
             if self.keyboard_2_device:
                 try:
-                    async for seed_event_2 \
+                    async for seed_event \
                             in self.keyboard_2_device.async_read_loop():
                         # Loop variables
                         active_keys: list[int] = self.keyboard_2_device.active_keys()
@@ -149,11 +149,11 @@ class HandheldController(EventEmitter):
 
                         # Debugging variables
                         logger.debug(
-                            f"Seed Value: {seed_event_2.value}, "
-                            f"Seed Code: {seed_event_2.code}, "
-                            f"Seed Type: {seed_event_2.type}."
+                            f"Seed Value: {seed_event.value}, "
+                            f"Seed Code: {seed_event.code}, "
+                            f"Seed Type: {seed_event.type}."
                         )
-                        logger.debug(f"Active Keys: {active_keys_2}")
+                        logger.debug(f"Active Keys: {active_keys}")
                         logger.debug(f"Queued events: {self.event_queue}")
                         logger.debug('-----' * 10)
 
@@ -162,8 +162,8 @@ class HandheldController(EventEmitter):
                         match self.system_type:
                             case "ALY_GEN1":
                                 await self.process_event(
-                                    seed_event_2,
-                                    active_keys_2
+                                    seed_event,
+                                    active_keys
                                 )
 
                 except Exception as err:
