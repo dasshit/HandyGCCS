@@ -301,7 +301,7 @@ async def process_event(
     if active_keys == [] and handycon.event_queue != []:
         this_button = handycon.event_queue[0]
 
-    if active_keys == [307] \
+    if active_keys == [186, 307] \
             and seed_event.code == 186 \
             and button_on == 1:
         handycon.event_queue.append(["Open Keyboard"])
