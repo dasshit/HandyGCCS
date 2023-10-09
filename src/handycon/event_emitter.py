@@ -105,6 +105,8 @@ class EventEmitter(DeviceExplorer):
                 )
                 return
             match event_list[0]:
+                case "Open Keyboard":
+                    self.steam_ifrunning_deckui('steam://open/keyboard')
                 case "Open Chimera":
                     logger.debug(
                         "Open Chimera"

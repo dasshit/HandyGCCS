@@ -304,11 +304,7 @@ async def process_event(
     if active_keys == [307] \
             and seed_event.code == 186 \
             and button_on == 1:
-        await handycon.emit_now(seed_event, EVENT_ALT_ENTER, 1)
-    elif active_keys == [307] \
-            and seed_event.code == 186 \
-            and button_on == 0:
-        await handycon.emit_now(seed_event, EVENT_ALT_ENTER, 1)
+        await handycon.emit_now(seed_event, ["Open Keyboard"], 1)
 
     if active_keys == [187] \
             and button_on in [1, 2]:
