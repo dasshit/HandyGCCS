@@ -127,3 +127,12 @@ class BrightnessController:
         self.set_led_brightness(
             current_brightness - 1
         )
+
+    def switch_led_mode(self):
+        try:
+            cmd = f"openrgb -d 0 -m '{next(self.led_mods)}"
+            logger.debug(f'CMD: {cmd}')
+            os.system(cmd)
+        except Exception as error:
+            logger.error(f'Error while setting new mode for led')
+            logger.exception(error)
