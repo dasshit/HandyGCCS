@@ -13,7 +13,7 @@ class BrightnessController:
         self.led_path = pathlib.Path(
             '/sys/class/leds/asus'
             '::kbd_backlight/device/leds/asus'
-            '::kbd_backlight/brightnes'
+            '::kbd_backlight/brightness'
         )
 
     @property
