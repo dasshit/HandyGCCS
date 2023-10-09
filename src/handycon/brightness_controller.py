@@ -112,17 +112,19 @@ class BrightnessController:
         self.led_path.write_text(f'{value}\n')
 
     def increase_led_brightness(self):
+        logger.info('Increasing led brightness')
         current_brightness = self.get_led_brightness()
         if current_brightness == 0:
-            os.system(
-                "brightnessctl -d 'asus::kbd_backlight' s 33%"
-            )
+            cmd = "brightnessctl -d 'asus::kbd_backlight' s 33%"
+            logger.debug(cmd)
+            os.system(cmd)
         else:
             self.set_led_brightness(
                 current_brightness + 1
             )
 
     def decrease_led_brightness(self):
+        logger.info('Decreasing led brightness')
         current_brightness = self.get_led_brightness()
         self.set_led_brightness(
             current_brightness - 1
@@ -131,7 +133,7 @@ class BrightnessController:
     def switch_led_mode(self):
         try:
             cmd = f"openrgb -d 0 -m '{next(self.led_mods)}'"
-            logger.debug(f'CMD: {cmd}')
+            logger.info(f'CMD: {cmd}')
             os.system(cmd)
         except Exception as error:
             logger.error(f'Error while setting new mode for led')

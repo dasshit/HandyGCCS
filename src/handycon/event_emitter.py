@@ -116,7 +116,7 @@ class EventEmitter(DeviceExplorer):
                     self.brightness.increase_led_brightness()
                 case "Decrease led brightness":
                     self.brightness.decrease_led_brightness()
-                case "Switch led brightness":
+                case "Switch led mode":
                     self.brightness.switch_led_mode()
                 case "Open Keyboard":
                     self.steam_ifrunning_deckui('steam://open/keyboard')
@@ -384,11 +384,11 @@ class EventEmitter(DeviceExplorer):
         if active_keys == [148, 310, 311] \
                 and seed_event.code == 148 \
                 and button_on == 1:
-            self.event_queue.append(["Switch led brightness"])
+            self.event_queue.append(["Switch led mode"])
         elif active_keys == [310, 311] \
                 and seed_event.code == 148 \
                 and button_on == 0:
-            this_button = ["Switch led brightness"]
+            this_button = ["Switch led mode"]
 
         if active_keys == [186, 307] \
                 and seed_event.code == 186 \
