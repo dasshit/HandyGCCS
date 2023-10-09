@@ -13,7 +13,7 @@ import sys
 import warnings
 
 # Local modules
-from brightness_controller import ScreenBrightnessController
+from .brightness_controller import ScreenBrightnessController
 from .event_emitter import EventEmitter
 from .constants import \
     HIDE_PATH, \
