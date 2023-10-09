@@ -30,7 +30,7 @@ class ScreenBrightnessController:
 
     def set_display_brightness(self, value: int) -> bool:
         try:
-            (self.display_path / 'actual_brightness').write_text(f'{value}\n')
+            (self.display_path / 'brightness').write_text(f'{value}\n')
             return True
         except Exception as error:
             logger.error(
