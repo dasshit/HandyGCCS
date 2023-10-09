@@ -21,8 +21,7 @@ from ..constants import \
     EVENT_BTN_A, \
     EVENT_BTN_B, \
     EVENT_BTN_X, \
-    EVENT_BTN_Y
-
+    EVENT_BTN_Y, EVENT_ALT_ENTER
 
 logger = logging.getLogger('handycon')
 
@@ -301,6 +300,15 @@ async def process_event(
     # Handle missed keys.
     if active_keys == [] and handycon.event_queue != []:
         this_button = handycon.event_queue[0]
+
+    if active_keys == [307] \
+            and seed_event.code == 186 \
+            and button_on == 1:
+        await handycon.emit_now(seed_event, EVENT_ALT_ENTER, 1)
+    elif active_keys == [307] \
+            and seed_event.code == 186 \
+            and button_on == 0:
+        await handycon.emit_now(seed_event, EVENT_ALT_ENTER, 1)
 
     if active_keys == [187] \
             and button_on in [1, 2]:

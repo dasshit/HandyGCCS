@@ -206,6 +206,10 @@ CONTROLLER_EVENTS: dict[
     ],
 }
 DETECT_DELAY: float = 0.5
+EVENT_ALT_ENTER: list[list[int]] = [
+    [e.EV_KEY, e.KEY_LEFTALT],
+    [e.EV_KEY, e.KEY_ENTER]
+]
 EVENT_ALT_TAB: list[
     list[int]
 ] = [
