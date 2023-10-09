@@ -13,7 +13,6 @@ import sys
 import warnings
 
 # Local modules
-from .brightness_controller import ScreenBrightnessController
 from .event_emitter import EventEmitter
 from .constants import \
     HIDE_PATH, \
@@ -38,7 +37,6 @@ class HandheldController(EventEmitter):
 
     def __init__(self):
         EventEmitter.__init__(self)
-        self.brightness = ScreenBrightnessController()
 
         # Run asyncio loop to capture all events.
         self.loop = asyncio.get_event_loop()

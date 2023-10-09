@@ -13,6 +13,8 @@ from evdev import \
     InputEvent, \
     UInput
 
+from .brightness_controller import \
+    ScreenBrightnessController
 from .constants import \
     CONTROLLER_EVENTS, \
     CHIMERA_LAUNCHER_PATH, \
@@ -38,6 +40,7 @@ class EventEmitter(DeviceExplorer):
 
     def __init__(self):
         DeviceExplorer.__init__(self)
+        self.brightness = ScreenBrightnessController()
         self.ui_device = UInput(
             CONTROLLER_EVENTS,
             name='Handheld Controller',
@@ -105,6 +108,10 @@ class EventEmitter(DeviceExplorer):
                 )
                 return
             match event_list[0]:
+                case "Increase brightness":
+                    self.brightness.increase_brightness(35)
+                case "Decrease brightness":
+                    self.brightness.decrease_brightness(35)
                 case "Open Keyboard":
                     self.steam_ifrunning_deckui('steam://open/keyboard')
                 case "Open Chimera":
@@ -331,6 +338,24 @@ class EventEmitter(DeviceExplorer):
         # Handle missed keys.
         if active_keys == [] and self.event_queue != []:
             this_button = self.event_queue[0]
+
+        if active_keys == [186, 308] \
+                and seed_event.code == 186 \
+                and button_on == 1:
+            self.event_queue.append(["Increase brightness"])
+        elif active_keys == [308] \
+                and seed_event.code == 186 \
+                and button_on == 0:
+            this_button = ["Increase brightness"]
+
+        if active_keys == [186, 304] \
+                and seed_event.code == 186 \
+                and button_on == 1:
+            self.event_queue.append(["Decrease brightness"])
+        elif active_keys == [304] \
+                and seed_event.code == 186 \
+                and button_on == 0:
+            this_button = ["Decrease brightness"]
 
         if active_keys == [186, 307] \
                 and seed_event.code == 186 \
