@@ -339,20 +339,20 @@ class EventEmitter(DeviceExplorer):
         if active_keys == [] and self.event_queue != []:
             this_button = self.event_queue[0]
 
-        if active_keys == [186, 308] \
+        if active_keys == [186, 311] \
                 and seed_event.code == 186 \
                 and button_on == 1:
             self.event_queue.append(["Increase brightness"])
-        elif active_keys == [308] \
+        elif active_keys == [311] \
                 and seed_event.code == 186 \
                 and button_on == 0:
             this_button = ["Increase brightness"]
 
-        if active_keys == [186, 304] \
+        if active_keys == [186, 310] \
                 and seed_event.code == 186 \
                 and button_on == 1:
             self.event_queue.append(["Decrease brightness"])
-        elif active_keys == [304] \
+        elif active_keys == [310] \
                 and seed_event.code == 186 \
                 and button_on == 0:
             this_button = ["Decrease brightness"]
