@@ -94,7 +94,11 @@ class HandheldController(EventEmitter):
                     async for seed_event \
                             in self.keyboard_device.async_read_loop():
                         # Loop variables
-                        active_keys = self.keyboard_device.active_keys()
+                        active_keys: list[int] = self.keyboard_device.active_keys()
+                        if self.keyboard_2_device:
+                            active_keys.extend(self.keyboard_2_device.active_keys())
+                        if self.controller_device:
+                            active_keys.extend(self.controller_device.active_keys())
 
                         # Debugging variables
                         logger.debug(
@@ -137,7 +141,11 @@ class HandheldController(EventEmitter):
                     async for seed_event_2 \
                             in self.keyboard_2_device.async_read_loop():
                         # Loop variables
-                        active_keys_2 = self.keyboard_2_device.active_keys()
+                        active_keys: list[int] = self.keyboard_2_device.active_keys()
+                        if self.keyboard_device:
+                            active_keys.extend(self.keyboard_device.active_keys())
+                        if self.controller_device:
+                            active_keys.extend(self.controller_device.active_keys())
 
                         # Debugging variables
                         logger.debug(
