@@ -6,6 +6,19 @@ import pathlib
 logger = logging.getLogger('handycon')
 
 
+def mode_generator():
+    while True:
+        for mode in [
+            'Direct',
+            'Static',
+            'Breathing',
+            'Spectrum Cycle',
+            'Rainbow Wave',
+            'Strobing'
+        ]:
+            yield mode
+
+
 class BrightnessController:
 
     def __init__(self):
@@ -15,6 +28,7 @@ class BrightnessController:
             '::kbd_backlight/device/leds/asus'
             '::kbd_backlight/brightness'
         )
+        self.led_mods = mode_generator()
 
     @property
     def display_path(self) -> pathlib.Path:
