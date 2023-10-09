@@ -18,6 +18,7 @@ classifiers = [
 ]
 dependencies = [
     "evdev",
+    "libusb1",
     "build",
     "installer"
 ]
