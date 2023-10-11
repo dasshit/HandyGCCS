@@ -246,6 +246,7 @@ class EventEmitter(DeviceExplorer):
         )
 
         ryzenadj_command = f'ryzenadj {cmd_args}'
+        logger.debug(ryzenadj_command)
         run = os.popen(ryzenadj_command, buffering=1).read().strip()
         logger.debug(run)
 
