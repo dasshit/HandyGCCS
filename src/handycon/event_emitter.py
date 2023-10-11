@@ -600,16 +600,8 @@ class EventEmitter(DeviceExplorer):
         Performs specific power actions based on user config.
         :return:
         """
-        logger.debug(f"Power Action: {self.power_action}")
-        match self.power_action:
-            case "Suspend":
-                os.system('systemctl suspend')
-
-            case "Hibernate":
-                os.system('systemctl hibernate')
-
-            case "Shutdown":
-                os.system('systemctl poweroff')
+        logger.debug(f"Power Action: Hibernate")
+        os.system('systemctl hibernate')
 
     async def handle_key_down(
             self,
