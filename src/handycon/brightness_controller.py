@@ -70,26 +70,22 @@ class BrightnessController:
                 value = 0
             assert value != self.get_current_brightness(), \
                 'New value == current brightness value'
+            add_toast(
+                title='[Handycon] Screen brightness',
+                body=f'Setting value {int(value * 100 / self.max_brightness)}%'
+            )
             self.set_display_brightness(value)
         except Exception as error:
             logger.debug(f'Cant assign new value: {type(error)}{error}')
             return False
 
     def increase_screen_brightness(self, value: int = 10):
-        add_toast(
-            title='[Handycon] Screen brightness',
-            body='Increasing brightness by 10',
-        )
         current_brightness = self.get_current_brightness()
         self.set_brightness(
             current_brightness + value
         )
 
     def decrease_screen_brightness(self, value: int = 10):
-        add_toast(
-            title='[Handycon] Screen brightness',
-            body='Decreasing brightness by 10',
-        )
         current_brightness = self.get_current_brightness()
         self.set_brightness(
             current_brightness - value
