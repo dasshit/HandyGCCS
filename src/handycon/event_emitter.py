@@ -229,9 +229,9 @@ class EventEmitter(DeviceExplorer):
         mode_arg = mode['mode']
         thermal_mode = mode['thermal_mode']
 
-        if mode == "Max Boost":
+        if mode_name == "Max Boost":
             cmd_args = f'-a 22000 -b 23000 -c 19000 {mode_arg}'
-        elif mode == "Average Performance":
+        elif mode_name == "Average Performance":
             cmd_args = f'-a 18000 -b 19000 -c 17000 {mode_arg}'
         else:
             cmd_args = f'-a 14000 -b 16000 -c 12000 {mode_arg}'
