@@ -230,11 +230,11 @@ class EventEmitter(DeviceExplorer):
         thermal_mode = mode['thermal_mode']
 
         if mode_name == "Max Boost":
-            cmd_args = f'-a 20000 -b 21000 -c 18000 {mode_arg}'
+            cmd_args = f'-a 21000 -b 22000 -c 19000 {mode_arg}'
         elif mode_name == "Average Performance":
-            cmd_args = f'-a 16000 -b 17000 -c 14000 {mode_arg}'
+            cmd_args = f'-a 17000 -b 18000 -c 16000 {mode_arg}'
         else:
-            cmd_args = f'-a 14500 -b 16000 -c 13000 {mode_arg}'
+            cmd_args = f'-a 12500 -b 13500 -c 12000 {mode_arg}'
 
         await self.do_rumble()
         await asyncio.sleep(FF_DELAY)
