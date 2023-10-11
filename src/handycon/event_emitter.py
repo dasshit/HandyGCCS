@@ -4,7 +4,7 @@ import logging
 import subprocess
 from pathlib import Path
 
-from typing import Optional
+from typing import Optional, Literal
 
 # Partial imports
 from evdev import \
@@ -37,8 +37,9 @@ class EventEmitter(DeviceExplorer):
     last_y_val: int = 0
 
     # Performance settings
-    performance_mode: str = "--max-performance"
-    thermal_mode: str = "1"
+    performance_mode: Literal[
+        "Max Performance", "Power Saving"] = "Max Performance"
+    thermal_mode: Literal["1", "0"] = "1"
 
     def __init__(self):
         DeviceExplorer.__init__(self)
@@ -200,13 +201,17 @@ class EventEmitter(DeviceExplorer):
         Switch performance mode
         :return:
         """
-        if self.performance_mode == "--max-performance":
-            self.performance_mode = "--power-saving"
+        if self.performance_mode == "Max Performance":
+            self.performance_mode = "Power Saving"
+            self.thermal_mode = "0"
+            cmd_args = f'-a 14000 -b 16000 -c 14000 {self.performance_mode}'
             await self.do_rumble()
             await asyncio.sleep(FF_DELAY)
             await self.do_rumble(interval=100)
         else:
-            self.performance_mode = "--max-performance"
+            self.performance_mode = "Max Performance"
+            self.thermal_mode = "1"
+            cmd_args = f'-a 20000 -b 21000 -c 19000 {self.performance_mode}'
             await self.do_rumble(interval=500)
             await asyncio.sleep(FF_DELAY)
             await self.do_rumble(interval=75)
@@ -215,14 +220,12 @@ class EventEmitter(DeviceExplorer):
 
         add_toast(
             title='[Handycon] Performance mode',
-            body=f'Switching to {self.performance_mode}'
+            body=f'Switching to "{self.performance_mode}" mode'
         )
 
-        ryzenadj_command = f'ryzenadj {self.performance_mode}'
+        ryzenadj_command = f'ryzenadj {cmd_args}'
         run = os.popen(ryzenadj_command, buffering=1).read().strip()
         logger.debug(run)
-
-        self.thermal_mode = "0" if self.thermal_mode == "1" else "1"
 
         command = f'echo {self.thermal_mode} > ' \
                   f'/sys/devices/' \
