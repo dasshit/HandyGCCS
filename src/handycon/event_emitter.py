@@ -38,8 +38,22 @@ class EventEmitter(DeviceExplorer):
 
     # Performance settings
     performance_mode: Literal[
-        "Max Performance", "Power Saving"] = "Max Performance"
-    thermal_mode: Literal["1", "0"] = "1"
+        "Max Boost", "Power Saving"] = "Max Boost"
+
+    perf_modes = {
+        "Max Boost": {
+            "mode": "--max-performance",
+            "thermal_mode": "1"
+        },
+        "Average Performance": {
+            "mode": "--max-performance",
+            "thermal_mode": "1"
+        },
+        "Power Saving": {
+            "mode": "--power-saving",
+            "thermal_mode": "0"
+        },
+    }
 
     def __init__(self):
         DeviceExplorer.__init__(self)
@@ -52,6 +66,13 @@ class EventEmitter(DeviceExplorer):
             product=0x028e,
             version=0x110
         )
+        self.mode_generator = self.mode_gen()
+
+    def mode_gen(self):
+        while True:
+            for key in self.perf_modes.keys():
+                yield self.perf_modes[key]
+
 
     async def emit_events(self, events: list[InputEvent]):
         """
@@ -201,38 +222,37 @@ class EventEmitter(DeviceExplorer):
         Switch performance mode
         :return:
         """
-        if self.performance_mode == "Max Performance":
-            self.performance_mode = "Power Saving"
-            self.thermal_mode = "0"
-            cmd_args = f'-a 14000 -b 16000 -c 14000 {self.performance_mode}'
-            await self.do_rumble()
-            await asyncio.sleep(FF_DELAY)
-            await self.do_rumble(interval=100)
+        mode = next(self.mode_generator)
+
+        mode_arg = mode['mode']
+        thermal_mode = mode['thermal_mode']
+
+        if mode == "Max Boost":
+            cmd_args = f'-a 22000 -b 23000 -c 19000 {mode_arg}'
+        elif mode == "Average Performance":
+            cmd_args = f'-a 18000 -b 19000 -c 17000 {mode_arg}'
         else:
-            self.performance_mode = "Max Performance"
-            self.thermal_mode = "1"
-            cmd_args = f'-a 20000 -b 21000 -c 19000 {self.performance_mode}'
-            await self.do_rumble(interval=500)
-            await asyncio.sleep(FF_DELAY)
-            await self.do_rumble(interval=75)
-            await asyncio.sleep(FF_DELAY)
-            await self.do_rumble(interval=75)
+            cmd_args = f'-a 14000 -b 16000 -c 12000 {mode_arg}'
+
+        await self.do_rumble()
+        await asyncio.sleep(FF_DELAY)
+        await self.do_rumble(interval=300)
 
         add_toast(
             title='[Handycon] Performance mode',
-            body=f'Switching to "{self.performance_mode}" mode'
+            body=f'Switching to "{mode}" mode'
         )
 
         ryzenadj_command = f'ryzenadj {cmd_args}'
         run = os.popen(ryzenadj_command, buffering=1).read().strip()
         logger.debug(run)
 
-        command = f'echo {self.thermal_mode} > ' \
+        command = f'echo {thermal_mode} > ' \
                   f'/sys/devices/' \
                   f'platform/asus-nb-wmi/throttle_thermal_policy'
         os.popen(command, buffering=1).read().strip()
         logger.debug(
-            f'Thermal mode set to {self.thermal_mode}.')
+            f'Thermal mode set to {thermal_mode}.')
 
     async def do_rumble(
             self,
