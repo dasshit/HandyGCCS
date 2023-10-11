@@ -42,14 +42,17 @@ class EventEmitter(DeviceExplorer):
 
     perf_modes = {
         "Max Boost": {
+            "name": "Max Boost",
             "mode": "--max-performance",
             "thermal_mode": "1"
         },
         "Average Performance": {
+            "name": "Average Performance",
             "mode": "--max-performance",
             "thermal_mode": "1"
         },
         "Power Saving": {
+            "name": "Power Saving",
             "mode": "--power-saving",
             "thermal_mode": "0"
         },
@@ -224,6 +227,7 @@ class EventEmitter(DeviceExplorer):
         """
         mode = next(self.mode_generator)
 
+        mode_name = mode['name']
         mode_arg = mode['mode']
         thermal_mode = mode['thermal_mode']
 
@@ -240,7 +244,7 @@ class EventEmitter(DeviceExplorer):
 
         add_toast(
             title='[Handycon] Performance mode',
-            body=f'Switching to "{mode}" mode'
+            body=f'Switching to "{mode_name}" mode'
         )
 
         ryzenadj_command = f'ryzenadj {cmd_args}'
