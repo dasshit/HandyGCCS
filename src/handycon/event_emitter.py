@@ -222,15 +222,14 @@ class EventEmitter(DeviceExplorer):
         run = os.popen(ryzenadj_command, buffering=1).read().strip()
         logger.debug(run)
 
-        if self.system_type in ["ALY_GEN1"]:
-            self.thermal_mode = "0" if self.thermal_mode == "1" else "1"
+        self.thermal_mode = "0" if self.thermal_mode == "1" else "1"
 
-            command = f'echo {self.thermal_mode} > ' \
-                      f'/sys/devices/' \
-                      f'platform/asus-nb-wmi/throttle_thermal_policy'
-            os.popen(command, buffering=1).read().strip()
-            logger.debug(
-                f'Thermal mode set to {self.thermal_mode}.')
+        command = f'echo {self.thermal_mode} > ' \
+                  f'/sys/devices/' \
+                  f'platform/asus-nb-wmi/throttle_thermal_policy'
+        os.popen(command, buffering=1).read().strip()
+        logger.debug(
+            f'Thermal mode set to {self.thermal_mode}.')
 
     async def do_rumble(
             self,
@@ -384,6 +383,11 @@ class EventEmitter(DeviceExplorer):
                 and seed_event.code == 148 \
                 and button_on == 1:
             this_button = ["Switch led mode"]
+
+        if active_keys == [186, 310, 311] \
+                and seed_event.code == 186 \
+                and button_on == 1:
+            this_button = ["Toggle Performance"]
 
         if active_keys == [186, 307] \
                 and seed_event.code == 186 \
