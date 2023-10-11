@@ -2,6 +2,8 @@ import logging
 import os
 import pathlib
 
+from .notify_db import add_toast
+
 
 logger = logging.getLogger('handycon')
 
@@ -9,12 +11,12 @@ logger = logging.getLogger('handycon')
 def mode_generator():
     while True:
         for mode in [
-            'Direct',
-            'Static',
+            # 'Direct',
+            # 'Static',
             'Breathing',
             'Spectrum Cycle',
             'Rainbow Wave',
-            'Strobing'
+            # 'Strobing'
         ]:
             yield mode
 
@@ -74,18 +76,30 @@ class BrightnessController:
             return False
 
     def increase_screen_brightness(self, value: int = 10):
+        add_toast(
+            title='[Handycon] Brightness',
+            body='Increasing brightness by 10',
+        )
         current_brightness = self.get_current_brightness()
         self.set_brightness(
             current_brightness + value
         )
 
     def decrease_screen_brightness(self, value: int = 10):
+        add_toast(
+            title='[Handycon] Brightness',
+            body='Decreasing brightness by 10',
+        )
         current_brightness = self.get_current_brightness()
         self.set_brightness(
             current_brightness - value
         )
 
     def turn_led_on(self):
+        add_toast(
+            title='[Handycon] LED Control',
+            body='Switching gamepad LED - ON',
+        )
         os.system(
             "brightnessctl -d 'asus::kbd_backlight' s 33%"
         )
@@ -113,6 +127,10 @@ class BrightnessController:
 
     def increase_led_brightness(self):
         logger.info('Increasing led brightness')
+        add_toast(
+            title='[Handycon] LED Control',
+            body='Increasing gamepad LED Brightness by 33%',
+        )
         current_brightness = self.get_led_brightness()
         if current_brightness == 0:
             cmd = "brightnessctl -d 'asus::kbd_backlight' s 33%"
@@ -125,16 +143,25 @@ class BrightnessController:
 
     def decrease_led_brightness(self):
         logger.info('Decreasing led brightness')
+        add_toast(
+            title='[Handycon] LED Control',
+            body='Decreasing gamepad LED Brightness by 33%',
+        )
         current_brightness = self.get_led_brightness()
         self.set_led_brightness(
             current_brightness - 1
         )
 
     def switch_led_mode(self):
+        mode = next(self.led_mods)
+        add_toast(
+            title='[Handycon] LED Control',
+            body=f'Switching LED mode to "{mode}"',
+        )
         try:
             cmd = f"openrgb " \
                   f"-d 'ASUS ROG Ally' " \
-                  f"-m '{next(self.led_mods)}' " \
+                  f"-m '{mode}' " \
                   f"--noautoconnect"
             logger.info(f'CMD: {cmd}')
             os.system(cmd)

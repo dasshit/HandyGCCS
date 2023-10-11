@@ -23,6 +23,8 @@ from .constants import \
 
 from .device_explorer import DeviceExplorer
 
+from .notify_db import add_toast
+
 
 logger = logging.getLogger('handycon')
 
@@ -180,6 +182,10 @@ class EventEmitter(DeviceExplorer):
         Launching Chimera App
         :return:
         """
+        add_toast(
+            title='[Handycon] Chimera App',
+            body='Openning Chimera App'
+        )
         if not self.HAS_CHIMERA_LAUNCHER:
             return False
         try:
@@ -206,6 +212,11 @@ class EventEmitter(DeviceExplorer):
             await self.do_rumble(interval=75)
             await asyncio.sleep(FF_DELAY)
             await self.do_rumble(interval=75)
+
+        add_toast(
+            title='[Handycon] Performance mode',
+            body=f'Switching to {self.performance_mode}'
+        )
 
         ryzenadj_command = f'ryzenadj {self.performance_mode}'
         run = os.popen(ryzenadj_command, buffering=1).read().strip()
@@ -263,6 +274,10 @@ class EventEmitter(DeviceExplorer):
         :param cmd:
         :return:
         """
+        add_toast(
+            title='[Handycon] Keyboard',
+            body='Openning screen keyboard'
+        )
         steampid_path = self.HOME_PATH / '.steam/steam.pid'
         try:
             pid = steampid_path.read_text().strip()
