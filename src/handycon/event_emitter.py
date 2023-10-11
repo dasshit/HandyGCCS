@@ -37,8 +37,8 @@ class EventEmitter(DeviceExplorer):
     last_y_val: int = 0
 
     # Performance settings
-    performance_mode: str = "--power-saving"
-    thermal_mode: str = "0"
+    performance_mode: str = "--max-performance"
+    thermal_mode: str = "1"
 
     def __init__(self):
         DeviceExplorer.__init__(self)
