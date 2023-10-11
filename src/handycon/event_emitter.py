@@ -38,7 +38,7 @@ class EventEmitter(DeviceExplorer):
 
     # Performance settings
     performance_mode: Literal[
-        "Max Boost", "Power Saving"] = "Max Boost"
+        "Max Boost", "Average Performance", "Power Saving"] = "Max Boost"
 
     perf_modes = {
         "Max Boost": {
