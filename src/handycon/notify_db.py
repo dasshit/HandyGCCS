@@ -29,7 +29,7 @@ class Toast(BaseModel):
 def add_toast(
         title: str,
         body: str,
-        duration: int = 5000
+        duration: int = 1500
 ):
     Toast.create(
         title=title,
