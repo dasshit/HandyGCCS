@@ -77,7 +77,7 @@ class BrightnessController:
 
     def increase_screen_brightness(self, value: int = 10):
         add_toast(
-            title='[Handycon] Brightness',
+            title='[Handycon] Screen brightness',
             body='Increasing brightness by 10',
         )
         current_brightness = self.get_current_brightness()
@@ -87,7 +87,7 @@ class BrightnessController:
 
     def decrease_screen_brightness(self, value: int = 10):
         add_toast(
-            title='[Handycon] Brightness',
+            title='[Handycon] Screen brightness',
             body='Decreasing brightness by 10',
         )
         current_brightness = self.get_current_brightness()
