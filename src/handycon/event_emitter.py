@@ -250,12 +250,12 @@ class EventEmitter(DeviceExplorer):
         run = os.popen(ryzenadj_command, buffering=1).read().strip()
         logger.debug(run)
 
-        command = f'echo {thermal_mode} > ' \
-                  f'/sys/devices/' \
-                  f'platform/asus-nb-wmi/throttle_thermal_policy'
-        os.popen(command, buffering=1).read().strip()
-        logger.debug(
-            f'Thermal mode set to {thermal_mode}.')
+        # command = f'echo {thermal_mode} > ' \
+        #           f'/sys/devices/' \
+        #           f'platform/asus-nb-wmi/throttle_thermal_policy'
+        # os.popen(command, buffering=1).read().strip()
+        # logger.debug(
+        #     f'Thermal mode set to {thermal_mode}.')
 
     async def do_rumble(
             self,
