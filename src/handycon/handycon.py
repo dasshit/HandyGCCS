@@ -13,6 +13,7 @@ import sys
 import warnings
 
 # Local modules
+from .notify_db import add_toast
 from .event_emitter import EventEmitter
 from .constants import \
     HIDE_PATH, \
@@ -108,18 +109,25 @@ class HandheldController(EventEmitter):
                         await self.process_event(seed_event, active_keys)
 
                 except Exception as err:
-                    logger.error(
-                        f"{err} | "
-                        f"Error reading events from "
-                        f"{self.keyboard_device.name}"
-                    )
+                    error_text = f"{err} | " \
+                                 f"Error reading events from " \
+                                 f"{self.keyboard_device.name}"
+                    logger.error(error_text)
                     logger.exception(err)
+                    add_toast(
+                        title='[Handycon][error] capture_keyboard_events',
+                        body=error_text
+                    )
                     self.remove_device(HIDE_PATH, self.keyboard_event)
                     self.keyboard_device = None
                     self.keyboard_event = None
                     self.keyboard_path = None
             else:
                 logger.info("Attempting to grab keyboard device...")
+                add_toast(
+                    title='[Handycon] capture_keyboard_events',
+                    body='Attempting to grab keyboard device...'
+                )
                 self.get_keyboard()
                 await asyncio.sleep(DETECT_DELAY)
 
@@ -159,18 +167,25 @@ class HandheldController(EventEmitter):
                         )
 
                 except Exception as err:
-                    logger.error(
-                        f"{err} | "
-                        f"Error reading events "
-                        f"from {self.keyboard_2_device.name}"
-                    )
+                    error_text = f"{err} | " \
+                                 f"Error reading events from " \
+                                 f"{self.keyboard_device.name}"
+                    logger.error(error_text)
                     logger.exception(err)
+                    add_toast(
+                        title='[Handycon][error] capture_keyboard_events_2',
+                        body=error_text
+                    )
                     self.remove_device(HIDE_PATH, self.keyboard_2_event)
                     self.keyboard_2_device = None
                     self.keyboard_2_event = None
                     self.keyboard_2_path = None
             else:
                 logger.info("Attempting to grab keyboard device 2...")
+                add_toast(
+                    title='[Handycon] capture_keyboard_events',
+                    body='Attempting to grab keyboard device 2...'
+                )
                 self.get_keyboard_2()
                 await asyncio.sleep(DETECT_DELAY)
 
@@ -205,18 +220,25 @@ class HandheldController(EventEmitter):
                         # Output the event.
                         self.emit_event(event)
                 except Exception as err:
-                    logger.error(
-                        f"{err} | "
-                        f"Error reading events from "
-                        f"{self.controller_device.name}."
-                    )
+                    error_text = f"{err} | " \
+                                 f"Error reading events from " \
+                                 f"{self.keyboard_device.name}"
+                    logger.error(error_text)
                     logger.exception(err)
+                    add_toast(
+                        title='[Handycon][error] capture_controller_events',
+                        body=error_text
+                    )
                     self.remove_device(HIDE_PATH, self.controller_event)
                     self.controller_device = None
                     self.controller_event = None
                     self.controller_path = None
             else:
                 logger.info("Attempting to grab controller device...")
+                add_toast(
+                    title='[Handycon] capture_keyboard_events',
+                    body='Attempting to grab controller...'
+                )
                 self.get_controller()
                 await asyncio.sleep(DETECT_DELAY)
 
@@ -253,10 +275,13 @@ class HandheldController(EventEmitter):
                             self.handle_power_action()
 
             except Exception as err:
-                logger.error(
-                    f"{err} | Error reading events from power device."
-                )
+                error_text = f"{err} | Error reading events from power device."
+                logger.error(error_text)
                 logger.exception(err)
+                add_toast(
+                    title='[Handycon] capture_power_events',
+                    body='Attempting to grab controller...'
+                )
                 self.power_device = None
                 self.power_device_2 = None
 
