@@ -50,11 +50,11 @@ class DeviceExplorer:
     CAPTURE_CONTROLLER = True
     CAPTURE_KEYBOARD = True
     CAPTURE_POWER = True
-    GAMEPAD_ADDRESS = 'usb-0000:0a:00.3-2/input0'
+    GAMEPAD_ADDRESS = 'usb-0000:09:00.3-2/input0'
     GAMEPAD_NAME = 'Microsoft X-Box 360 pad'
-    KEYBOARD_ADDRESS = 'usb-0000:0a:00.3-3/input0'
+    KEYBOARD_ADDRESS = 'usb-0000:09:00.3-3/input0'
     KEYBOARD_NAME = 'Asus Keyboard'
-    KEYBOARD_2_ADDRESS = 'usb-0000:0a:00.3-3/input2'
+    KEYBOARD_2_ADDRESS = 'usb-0000:09:00.3-3/input2'
     KEYBOARD_2_NAME = 'Asus Keyboard'
     POWER_BUTTON_PRIMARY: str = "LNXPWRBN/button/input0"
     POWER_BUTTON_SECONDARY: str = "PNP0C0C/button/input0"
