@@ -19,6 +19,7 @@ classifiers = [
 dependencies = [
     "evdev",
     "libusb1",
+    "peewee",
     "build",
     "installer"
 ]
